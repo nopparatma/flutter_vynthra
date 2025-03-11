@@ -1,7 +1,23 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_vynthra/utils/color_utils.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
-void main() {
+const apiKey = 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA';
+
+Future<void> main() async {
+  final model = GenerativeModel(
+    model: 'gemini-2.0-flash-lite',
+    apiKey: apiKey,
+  );
+
+  const prompt = 'สวัสดี';
+  final content = [Content.text(prompt)];
+  final response = await model.generateContent(content);
+
+  print('from AI : ${response.text}');
+
   runApp(const MyApp());
 }
 
@@ -11,7 +27,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: ''
+          'Vynthra',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -61,6 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
     {"id": 12, "name": "นางเบญจกัลยาณี", "image": "/api/placeholder/160/240", "meaning": "ความอุดมสมบูรณ์ ศีลธรรม จิตใจบริสุทธิ์"},
   ];
 
+  final String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  late List<Map<String, dynamic>> mockSummaryMeanings = [];
+
   final Map<int, Map<String, dynamic>> selectedCards = {};
   final ScrollController _scrollController = ScrollController();
   final double _appBarMinHeight = 0;
@@ -72,6 +92,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+
+    mockSummaryMeanings = [
+      {"id": 1, "colorCode": "#007BFF", "header": "การงาน", "body": loremIpsum},
+      {"id": 2, "colorCode": "#28A745", "header": "การเงิน", "body": loremIpsum},
+      {"id": 3, "colorCode": "#FF4D6D", "header": "ความรัก", "body": loremIpsum},
+    ];
   }
 
   @override
@@ -137,10 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
             itemBuilder: (context, index) => _buildPositionItem(context, index),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showBottomSheet(context),
-        child: const Icon(Icons.info_outline),
       ),
     );
   }
@@ -219,11 +241,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      onTap: () => hasSelectedCard ? null : _showBottomSheet(context, position: position),
+      onTap: () => hasSelectedCard
+          ? _showSummaryBottomSheet(
+              context,
+              positionName: position['name'],
+              selectedCardName: selectedCards[position["id"]]!["name"],
+            )
+          : _showAllCardsBottomSheet(
+              context,
+              position: position,
+            ),
     );
   }
 
-  void _showBottomSheet(BuildContext context, {Map<String, dynamic>? position}) {
+  void _showAllCardsBottomSheet(BuildContext context, {Map<String, dynamic>? position}) {
     TextEditingController searchController = TextEditingController();
     List<Map<String, dynamic>> filteredCards = List.from(allCards);
 
@@ -366,6 +397,137 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showSummaryBottomSheet(BuildContext context, {String? positionName, String? selectedCardName}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.90,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'สรุปคำทำนาย',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              const Divider(),
+              const SizedBox(height: 10),
+              Text(
+                'ไพ่ $selectedCardName',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'ตำแหน่ง $positionName',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...mockSummaryMeanings.map(
+                      (e) {
+                        return ExpandableNotifier(
+                          child: Card(
+                            clipBehavior: Clip.antiAlias,
+                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 10,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: hexToColor(e['colorCode']),
+                                      shape: BoxShape.rectangle,
+                                    ),
+                                  ),
+                                ),
+                                ScrollOnExpand(
+                                  scrollOnExpand: true,
+                                  scrollOnCollapse: false,
+                                  child: ExpandablePanel(
+                                    theme: const ExpandableThemeData(
+                                      headerAlignment: ExpandablePanelHeaderAlignment.center,
+                                      tapBodyToCollapse: true,
+                                    ),
+                                    header: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          e['header'],
+                                          style: Theme.of(context).textTheme.titleLarge,
+                                        )),
+                                    collapsed: Text(
+                                      e['body'],
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    expanded: Text(
+                                      e['body'],
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                      softWrap: true,
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                    builder: (_, collapsed, expanded) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                        child: Expandable(
+                                          collapsed: collapsed,
+                                          expanded: expanded,
+                                          theme: const ExpandableThemeData(crossFadePoint: 0),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         );
       },
     );
