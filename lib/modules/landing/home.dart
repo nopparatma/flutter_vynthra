@@ -1,6 +1,6 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_vynthra/utils/color_utils.dart';
+import 'package:flutter_vynthra/utils/color_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
