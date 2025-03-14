@@ -1,7 +1,9 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vynthra/app/router.dart';
 import 'package:flutter_vynthra/utils/color_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
+import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -158,10 +160,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       onTap: () => hasSelectedCard
-          ? _showSummaryBottomSheet(
-              context,
-              positionName: position['name'],
-              selectedCardName: selectedCards[position["id"]]!["name"],
+          ? Get.toNamed(
+              RoutePath.geminiPrediction,
+              arguments: {
+                'cardId': selectedCards[position["id"]]!["name"],
+                'positionId': position['name'],
+              },
             )
           : _showAllCardsBottomSheet(
               context,
