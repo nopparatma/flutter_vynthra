@@ -4,6 +4,7 @@ import 'package:flutter_vynthra/modules/card/card_detail.dart';
 import 'package:flutter_vynthra/modules/card/view_all_cards.dart';
 import 'package:flutter_vynthra/modules/gemini_prediction/gemini_prediction.dart';
 import 'package:flutter_vynthra/modules/landing/home.dart';
+import 'package:flutter_vynthra/modules/landing/splash.dart';
 import 'package:get/get.dart';
 
 class RoutePath {
@@ -22,11 +23,11 @@ class AppRouter {
       page: () => Container(),
       // middlewares: [AppMiddleware()],
       children: [
-        GetPage(name: RoutePath.splashPage, page: () => Container()),
-        GetPage(name: RoutePath.homePage, page: () => const HomePage()),
-        GetPage(name: RoutePath.viewAllCardsPage, page: () => const ViewAllCardsPage()),
-        GetPage(name: RoutePath.cardDetailPage, page: () => const CardDetailPage()),
-        GetPage(name: RoutePath.geminiPrediction, page: () => const GeminiPredictionPage()),
+        GetPage(name: RoutePath.splashPage, page: () => SplashPage()),
+        GetPage(name: RoutePath.homePage, page: () => HomePage()),
+        GetPage(name: RoutePath.viewAllCardsPage, page: () => ViewAllCardsPage()),
+        GetPage(name: RoutePath.cardDetailPage, page: () => CardDetailPage()),
+        GetPage(name: RoutePath.geminiPrediction, page: () => GeminiPredictionPage()),
       ],
     ),
   ];

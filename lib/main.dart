@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vynthra/app/router.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
+import 'app/app_controller.dart';
+
 void main() {
+  Get.put(AppController(), permanent: true);
+
   runApp(const MainApp());
 }
 
@@ -18,7 +23,7 @@ class MainApp extends StatelessWidget {
         useMaterial3: true,
       ),
       getPages: AppRouter.routes,
-      initialRoute: RoutePath.homePage,
+      initialRoute: RoutePath.splashPage,
     );
   }
 }

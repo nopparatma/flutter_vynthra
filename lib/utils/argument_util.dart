@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class ArgumentUtil {
-  static T getArgument<T>(String key, {required T defaultValue}) {
+  static T? getArgument<T>(String key, {T? defaultValue}) {
     final args = Get.arguments;
 
     if (args != null && args.containsKey(key)) {

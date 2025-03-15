@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_vynthra/models/card_model.dart';
+import 'package:flutter_vynthra/models/position_model.dart';
 import 'package:flutter_vynthra/utils/argument_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -16,19 +18,19 @@ class GeminiPredictionPage extends StatefulWidget {
 
 class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
   final ScrollController scrollController = ScrollController();
-  late String positionId;
-  late String cardId;
+  late PositionModel? positionItem;
+  late CardModel? cardItem;
   late GeminiPredictionController geminiPredictionController;
 
   @override
   void initState() {
-    positionId = ArgumentUtil.getArgument<String>('positionId', defaultValue: '');
-    cardId = ArgumentUtil.getArgument<String>('cardId', defaultValue: '');
+    positionItem = ArgumentUtil.getArgument<PositionModel>('positionItem');
+    cardItem = ArgumentUtil.getArgument<CardModel>('cardItem');
 
     geminiPredictionController = Get.put(
       GeminiPredictionController(
-        positionName: positionId,
-        cardName: cardId,
+        positionItem: positionItem,
+        cardItem: cardItem,
       ),
     );
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_vynthra/models/card_model.dart';
 import 'package:flutter_vynthra/utils/argument_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
-import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class CardDetailPage extends StatefulWidget {
@@ -13,11 +13,11 @@ class CardDetailPage extends StatefulWidget {
 
 class _CardDetailPageState extends State<CardDetailPage> {
   final ScrollController scrollController = ScrollController();
-  late String cardId;
+  late CardModel? cardItem;
 
   @override
   void initState() {
-    cardId = ArgumentUtil.getArgument<String>('cardId', defaultValue: '');
+    cardItem = ArgumentUtil.getArgument<CardModel>('cardItem');
 
     super.initState();
   }
@@ -30,7 +30,7 @@ class _CardDetailPageState extends State<CardDetailPage> {
   @override
   Widget build(BuildContext context) {
     return CommonLayout(
-        title: cardId,
+        title: cardItem?.name.th ?? "",
         isShowMenu: false,
         isShowBackAppBar: true,
         scrollController: scrollController,

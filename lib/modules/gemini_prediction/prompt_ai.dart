@@ -1,28 +1,28 @@
+import 'package:flutter_vynthra/models/card_model.dart';
+import 'package:flutter_vynthra/models/position_model.dart';
+
 class PromptAi {
-  final String cardName;
-  final String positionName;
-  final String cardInfo;
-  final String positionInfo;
+  final CardModel? cardItem;
+  final PositionModel? positionItem;
   final String htmlExample;
 
   PromptAi({
-    required this.cardName,
-    required this.positionName,
-    required this.cardInfo,
-    required this.positionInfo,
+    required this.cardItem,
+    required this.positionItem,
     required this.htmlExample,
   });
 
   String generatePrompt() {
     return '''  คุณคือหมอดูที่มีความเชี่ยวชาญในการอ่านไพ่และสามารถแปลความหมายของไพ่ตามบริบทของตำแหน่งที่วางได้อย่างแม่นยำ
+                โดยให้ตอบออกมาให้เป็นกันเองมากที่สุด
 
-                ผู้รับคำทำนายได้เลือก "$cardName" และถูกวางที่ตำแหน่ง "$positionName"
+                ผู้รับคำทำนายได้เลือก "${cardItem?.name.th}" และถูกวางที่ตำแหน่ง "${positionItem?.name.th}"
                 
                 ข้อมูลหลักของไพ่ :
-                "$cardInfo"
+                [รายละเดียด = ${cardItem?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cardItem?.getPredictionText(lang: 'th')}]
                 
                 ข้อมูลตำแหน่ง :
-                "$positionInfo"
+                [${positionItem?.getDescriptionText(lang: 'th')}]
                 
                 โจทย์ :
                 ให้คุณทำการทำนายโดยพิจารณา และแปลความหมายของไพ่ตามบริบทของตำแหน่งนั้นๆ
@@ -40,6 +40,6 @@ class PromptAi {
 
   @override
   String toString() {
-    return 'PromptAi{cardName: $cardName, positionName: $positionName, cardInfo: $cardInfo, positionInfo: $positionInfo, htmlExample: $htmlExample}';
+    return 'PromptAi{cardItem: $cardItem, positionItem: $positionItem, htmlExample: $htmlExample}';
   }
 }

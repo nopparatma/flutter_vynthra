@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_vynthra/models/card_model.dart';
+import 'package:flutter_vynthra/models/position_model.dart';
 import 'package:flutter_vynthra/modules/gemini_prediction/prompt_ai.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -10,10 +12,13 @@ class GeminiPredictionController extends GetxController {
   var predictionHtml = ''.obs;
   var errorMessage = ''.obs;
 
-  final String positionName;
-  final String cardName;
+  final PositionModel? positionItem;
+  final CardModel? cardItem;
 
-  GeminiPredictionController({required this.positionName, required this.cardName});
+  GeminiPredictionController({
+    required this.positionItem,
+    required this.cardItem,
+  });
 
   @override
   void onInit() {
@@ -34,10 +39,8 @@ class GeminiPredictionController extends GetxController {
       );
 
       final String prompt = PromptAi(
-        cardName: cardName,
-        positionName: positionName,
-        cardInfo: 'cardInfo',
-        positionInfo: 'positionInfo',
+        cardItem: cardItem,
+        positionItem: positionItem,
         htmlExample: htmlDataFromAIExample,
       ).generatePrompt();
       debugPrint('Prompt: $prompt');
