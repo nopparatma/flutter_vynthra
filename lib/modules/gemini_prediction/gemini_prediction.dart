@@ -3,8 +3,8 @@ import 'package:flutter_vynthra/utils/argument_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:get/get.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'gemini_loading_animation.dart';
 import 'gemini_prediction_controller.dart';
 
 class GeminiPredictionPage extends StatefulWidget {
@@ -42,46 +42,66 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
     super.dispose();
   }
 
+  void onPressRefresh() {
+    geminiPredictionController.fetchPredictionData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CommonLayout(
-      title: 'สรุปคำทำนาย',
-      isShowBackAppBar: true,
-      isShowMenu: false,
-      scrollController: scrollController,
-      body: ListView(
-        controller: scrollController,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Obx(
-              () {
-                if (geminiPredictionController.isLoading.value) {
-                  return Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                      color: Colors.deepPurpleAccent,
-                      size: 25,
-                    ),
-                  );
-                }
+    return Obx(
+      () {
+        // Determine if the refresh action should be shown
+        final bool showRefreshAction = !geminiPredictionController.isLoading.value;
 
-                if (geminiPredictionController.errorMessage.value.isNotEmpty) {
-                  return _buildErrorView(geminiPredictionController);
-                }
-
-                return _buildPredictionContent(geminiPredictionController);
-              },
-            ),
-          )
-        ],
-      ),
+        return CommonLayout(
+          title: 'สรุปคำทำนาย AI',
+          isShowBackAppBar: true,
+          isShowMenu: false,
+          action: !showRefreshAction
+              ? null
+              : IconButton(
+                  onPressed: onPressRefresh,
+                  icon: const Icon(
+                    Icons.refresh,
+                    size: 30,
+                  ),
+                ),
+          scrollController: scrollController,
+          body: _buildBody(),
+        );
+      },
     );
   }
 
+  Widget _buildBody() {
+    if (geminiPredictionController.isLoading.value) {
+      return _buildLoading();
+    }
+
+    if (geminiPredictionController.errorMessage.value.isNotEmpty) {
+      return _buildErrorView(geminiPredictionController);
+    }
+
+    return _buildPredictionContent(geminiPredictionController);
+  }
+
   Widget _buildPredictionContent(GeminiPredictionController controller) {
-    return HtmlWidget(
-      controller.predictionHtml.value.isNotEmpty ? controller.predictionHtml.value : 'ไม่พบข้อมูลคำทำนาย',
-      textStyle: const TextStyle(fontSize: 16),
+    return ListView(
+      controller: scrollController,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 16.0,
+            left: 16.0,
+            right: 16.0,
+          ),
+          child: HtmlWidget(
+            controller.predictionHtml.value.isNotEmpty ? controller.predictionHtml.value : 'ไม่พบข้อมูลคำทำนาย',
+            textStyle: const TextStyle(fontSize: 16),
+          ),
+        ),
+        SizedBox(height: 50),
+      ],
     );
   }
 
@@ -106,6 +126,30 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
           child: const Text('ลองใหม่อีกครั้ง'),
         ),
       ],
+    );
+  }
+
+  Widget _buildLoading() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GeminiLoadingAnimation(
+            imagePath: 'assets/images/gemini_logo.png',
+            width: 200,
+            height: 200,
+            blinkDuration: const Duration(seconds: 1),
+          ),
+          const SizedBox(height: 32),
+          const Text(
+            'Loading...',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

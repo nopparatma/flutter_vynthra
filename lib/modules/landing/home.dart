@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vynthra/app/router.dart';
 import 'package:flutter_vynthra/utils/color_util.dart';
 import 'package:flutter_vynthra/widget/custom_app_bar.dart';
+import 'package:flutter_vynthra/widget/rainbow_border_button.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
@@ -65,6 +66,16 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  void onPressedGeminiAI(Map<String, dynamic> position) {
+    Get.toNamed(
+      RoutePath.geminiPrediction,
+      arguments: {
+        'cardId': selectedCards[position["id"]]!["name"],
+        'positionId': position['name'],
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonLayout(
@@ -102,15 +113,24 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.center,
           children: [
             if (hasSelectedCard)
-              Center(
-                child: Text(
-                  selectedCards[position["id"]]!["name"],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    selectedCards[position["id"]]!["name"],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
+                  SizedBox(height: 8),
+                  RainbowBorderButton(
+                    title: 'Gemini AI',
+                    icon: Icons.star_border,
+                    onPressed: () => onPressedGeminiAI(position),
+                  ),
+                ],
               )
             else
               const Center(
@@ -160,13 +180,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       onTap: () => hasSelectedCard
-          ? Get.toNamed(
-              RoutePath.geminiPrediction,
-              arguments: {
-                'cardId': selectedCards[position["id"]]!["name"],
-                'positionId': position['name'],
-              },
-            )
+          ? null
           : _showAllCardsBottomSheet(
               context,
               position: position,

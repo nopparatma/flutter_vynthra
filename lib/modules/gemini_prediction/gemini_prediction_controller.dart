@@ -57,8 +57,9 @@ class GeminiPredictionController extends GetxController {
         errorMessage.value = 'ไม่มีข้อมูลคำทำนายจาก AI';
       }
     } catch (e) {
-      errorMessage.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาลองใหม่อีกครั้ง';
+      // errorMessage.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาลองใหม่อีกครั้ง';
       debugPrint('Exception: $e');
+      errorMessage.value = 'Exception: $e';
     } finally {
       isLoading.value = false;
     }
