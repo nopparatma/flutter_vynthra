@@ -7,8 +7,8 @@ class CardModel {
   BaseI18nText name;
   BaseI18nText cardSet;
   String imageUrl;
-  List<CardDescription> description;
-  List<CardPrediction> prediction;
+  List<Description> description;
+  List<Description> prediction;
 
   CardModel({
     this.id = '',
@@ -22,14 +22,14 @@ class CardModel {
   factory CardModel.fromMap(Map<String, dynamic> map) {
     final id = map['_id'] is ObjectId ? (map['_id'] as ObjectId).oid : map['_id']?.toString() ?? '';
 
-    List<CardDescription> descriptionList = [];
+    List<Description> descriptionList = [];
     if (map['description'] != null && map['description'] is List) {
-      descriptionList = (map['description'] as List).map((item) => CardDescription.fromMap(item)).toList();
+      descriptionList = (map['description'] as List).map((item) => Description.fromMap(item)).toList();
     }
 
-    List<CardPrediction> predictionList = [];
+    List<Description> predictionList = [];
     if (map['prediction'] != null && map['prediction'] is List) {
-      predictionList = (map['prediction'] as List).map((item) => CardPrediction.fromMap(item)).toList();
+      predictionList = (map['prediction'] as List).map((item) => Description.fromMap(item)).toList();
     }
 
     return CardModel(
@@ -168,19 +168,22 @@ class CardModel {
   }
 }
 
-class CardDescription {
+class Description {
+  String colorCode;
   BaseI18nText category;
   BaseI18nText content;
 
-  CardDescription({
+  Description({
     required this.category,
     required this.content,
+    required this.colorCode,
   });
 
-  factory CardDescription.fromMap(Map<String, dynamic> map) {
-    return CardDescription(
+  factory Description.fromMap(Map<String, dynamic> map) {
+    return Description(
       category: BaseI18nText.fromMap(map['category'] ?? {}),
       content: BaseI18nText.fromMap(map['content'] ?? {}),
+      colorCode: map['colorCode'] ?? '',
     );
   }
 
@@ -188,30 +191,7 @@ class CardDescription {
     return {
       'category': category.toMap(),
       'content': content.toMap(),
-    };
-  }
-}
-
-class CardPrediction {
-  BaseI18nText category;
-  BaseI18nText content;
-
-  CardPrediction({
-    required this.category,
-    required this.content,
-  });
-
-  factory CardPrediction.fromMap(Map<String, dynamic> map) {
-    return CardPrediction(
-      category: BaseI18nText.fromMap(map['category'] ?? {}),
-      content: BaseI18nText.fromMap(map['content'] ?? {}),
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'category': category.toMap(),
-      'content': content.toMap(),
+      'colorCode': colorCode,
     };
   }
 }

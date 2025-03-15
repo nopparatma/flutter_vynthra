@@ -48,20 +48,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> onTapPosition(PositionModel position) async {
-    CardModel? cardItem = await Get.toNamed(
+  Future<void> onTapPosition(PositionModel currentPosition) async {
+    CardModel? cardItemSelected = await Get.toNamed(
       RoutePath.viewAllCardsPage,
       arguments: {"isFromSelectCardOnly": true},
     ) as CardModel?;
 
-    if (!mounted || cardItem == null) return;
+    if (!mounted || cardItemSelected == null) return;
 
-    bool isDuplicate = selectedCards.values.any((card) => card.id == cardItem.id);
+    bool isDuplicate = selectedCards.values.any((card) => card.id == cardItemSelected.id);
 
     if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('ไพ่ "${cardItem.name.th}" ถูกเลือกไปแล้ว\nกรุณาเลือกไพ่อื่น'),
+          content: Text('ไพ่ "${cardItemSelected.name.th}" ถูกเลือกไปแล้ว\nกรุณาเลือกไพ่อื่น'),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),
         ),
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      selectedCards[position.id] = cardItem;
+      selectedCards[currentPosition.id] = cardItemSelected;
     });
   }
 
@@ -182,135 +182,4 @@ class _HomePageState extends State<HomePage> {
       onTap: () => hasSelectedCard ? null : onTapPosition(position),
     );
   }
-
-// void _showSummaryBottomSheet(BuildContext context, {String? positionName, String? selectedCardName}) {
-//   showModalBottomSheet(
-//     context: context,
-//     isScrollControlled: true,
-//     shape: const RoundedRectangleBorder(
-//       borderRadius: BorderRadius.vertical(
-//         top: Radius.circular(20),
-//       ),
-//     ),
-//     builder: (BuildContext context) {
-//       return Container(
-//         padding: const EdgeInsets.all(16),
-//         height: MediaQuery.of(context).size.height * 0.90,
-//         decoration: const BoxDecoration(
-//           borderRadius: BorderRadius.vertical(
-//             top: Radius.circular(20),
-//           ),
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 const Text(
-//                   'สรุปคำทำนาย',
-//                   style: TextStyle(
-//                     fontSize: 20,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 IconButton(
-//                   icon: const Icon(Icons.close),
-//                   onPressed: () {
-//                     Navigator.of(context).pop();
-//                   },
-//                 ),
-//               ],
-//             ),
-//             const Divider(),
-//             const SizedBox(height: 10),
-//             Text(
-//               'ไพ่ $selectedCardName',
-//               style: const TextStyle(
-//                 fontSize: 16,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             Text(
-//               'ตำแหน่ง $positionName',
-//               style: const TextStyle(
-//                 fontSize: 16,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             const SizedBox(height: 10),
-//             Expanded(
-//               child: ListView(
-//                 children: [
-//                   ...mockSummaryMeanings.map(
-//                     (e) {
-//                       return ExpandableNotifier(
-//                         child: Card(
-//                           clipBehavior: Clip.antiAlias,
-//                           margin: const EdgeInsets.symmetric(vertical: 8.0),
-//                           child: Column(
-//                             children: <Widget>[
-//                               SizedBox(
-//                                 height: 10,
-//                                 child: Container(
-//                                   decoration: BoxDecoration(
-//                                     color: hexToColor(e['colorCode']),
-//                                     shape: BoxShape.rectangle,
-//                                   ),
-//                                 ),
-//                               ),
-//                               ScrollOnExpand(
-//                                 scrollOnExpand: true,
-//                                 scrollOnCollapse: false,
-//                                 child: ExpandablePanel(
-//                                   theme: const ExpandableThemeData(
-//                                     headerAlignment: ExpandablePanelHeaderAlignment.center,
-//                                     tapBodyToCollapse: true,
-//                                   ),
-//                                   header: Padding(
-//                                       padding: const EdgeInsets.all(10),
-//                                       child: Text(
-//                                         e['header'],
-//                                         style: Theme.of(context).textTheme.titleLarge,
-//                                       )),
-//                                   collapsed: Text(
-//                                     e['body'],
-//                                     style: Theme.of(context).textTheme.bodyMedium,
-//                                     softWrap: true,
-//                                     maxLines: 2,
-//                                     overflow: TextOverflow.ellipsis,
-//                                   ),
-//                                   expanded: Text(
-//                                     e['body'],
-//                                     style: Theme.of(context).textTheme.bodyMedium,
-//                                     softWrap: true,
-//                                     overflow: TextOverflow.fade,
-//                                   ),
-//                                   builder: (_, collapsed, expanded) {
-//                                     return Padding(
-//                                       padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-//                                       child: Expandable(
-//                                         collapsed: collapsed,
-//                                         expanded: expanded,
-//                                         theme: const ExpandableThemeData(crossFadePoint: 0),
-//                                       ),
-//                                     );
-//                                   },
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 ],
-//               ),
-//             )
-//           ],
-//         ),
-//       );
-//     },
-//   );
-// }
 }
