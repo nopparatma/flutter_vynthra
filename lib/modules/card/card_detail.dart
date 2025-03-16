@@ -78,7 +78,9 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
                       Tab(text: 'รายละเอียด'),
                       Tab(text: 'การพยากรณ์'),
                     ],
-                    labelStyle: Theme.of(context).textTheme.titleMedium,
+                    labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                     indicatorColor: AppTheme.accentColor,
                     labelColor: AppTheme.accentColor,
                     indicatorSize: TabBarIndicatorSize.tab,
