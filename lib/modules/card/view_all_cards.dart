@@ -18,6 +18,7 @@ class ViewAllCardsPage extends StatefulWidget {
 class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   final AppController appController = Get.find<AppController>();
   final ScrollController scrollController = ScrollController();
+  final FocusNode searchFocusNode = FocusNode();
   TextEditingController searchController = TextEditingController();
   late bool? isFromSelectCardOnly;
 
@@ -31,10 +32,13 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   @override
   void dispose() {
     searchController.dispose();
+    searchFocusNode.dispose();
     super.dispose();
   }
 
   void onTapCard(CardModel cardItem) {
+    _clearFocus();
+
     if (isFromSelectCardOnly ?? false) {
       Navigator.pop(context, cardItem);
       return;
@@ -43,61 +47,72 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
     Get.toNamed(RoutePath.cardDetailPage, arguments: {'cardItem': cardItem});
   }
 
+  void _clearFocus() {
+    if (searchFocusNode.hasFocus) {
+      searchFocusNode.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CommonLayout(
-      title: (isFromSelectCardOnly ?? false) ? 'เลือกไพ่' : 'ไพ่ทั้งหมด',
-      isShowMenu: false,
-      isShowBackAppBar: true,
-      scrollController: scrollController,
-      body: Obx(() => CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverStickyHeader(
-                header: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'ค้นหาไพ่...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: _clearFocus,
+      child: CommonLayout(
+        title: (isFromSelectCardOnly ?? false) ? 'เลือกไพ่' : 'ไพ่ทั้งหมด',
+        isShowMenu: false,
+        isShowBackAppBar: true,
+        scrollController: scrollController,
+        body: Obx(() => CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverStickyHeader(
+                  header: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: searchController,
+                      focusNode: searchFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'ค้นหาไพ่...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
+                        suffixIcon: searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  searchController.clear();
+                                  appController.filterCards('');
+                                  _clearFocus();
+                                },
+                              )
+                            : null,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
-                      suffixIcon: searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                searchController.clear();
-                                appController.filterCards('');
-                              },
-                            )
-                          : null,
+                      onChanged: (value) {
+                        appController.filterCards(value);
+                      },
                     ),
-                    onChanged: (value) {
-                      appController.filterCards(value);
-                    },
                   ),
-                ),
-                sliver: SliverPadding(
-                  padding: const EdgeInsets.all(8.0),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: appController.filteredCards.length,
-                      (BuildContext context, int index) => _buildImageWithCaption(appController.filteredCards[index]),
+                  sliver: SliverPadding(
+                    padding: const EdgeInsets.all(8.0),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 1,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        childCount: appController.filteredCards.length,
+                        (BuildContext context, int index) => _buildImageWithCaption(appController.filteredCards[index]),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+      ),
     );
   }
 
