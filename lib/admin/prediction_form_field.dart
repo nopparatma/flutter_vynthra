@@ -20,11 +20,11 @@ class PredictionFormField extends StatefulWidget {
   final Function(int) onRemove;
 
   const PredictionFormField({
-    Key? key,
+    super.key,
     required this.index,
     required this.predictionField,
     required this.onRemove,
-  }) : super(key: key);
+  });
 
   @override
   State<PredictionFormField> createState() => _PredictionFormFieldState();

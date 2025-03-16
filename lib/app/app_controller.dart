@@ -13,6 +13,7 @@ class AppController extends GetxController {
 
   final RxList<PositionModel> positions = <PositionModel>[].obs;
   final RxList<CardModel> cards = <CardModel>[].obs;
+  final RxList<CardModel> filteredCards = <CardModel>[].obs;
 
   @override
   void onClose() {
@@ -55,7 +56,7 @@ class AppController extends GetxController {
       final List<Map<String, dynamic>> results = await _mongo.find('positions');
       positions.value = results.map((data) => PositionModel.fromMap(data)).toList();
     } catch (e) {
-      print('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
+      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
     }
   }
 
@@ -63,8 +64,25 @@ class AppController extends GetxController {
     try {
       final List<Map<String, dynamic>> results = await _mongo.find('cards');
       cards.value = results.map((data) => CardModel.fromMap(data)).toList();
+      resetFilteredCards();
     } catch (e) {
-      print('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
+      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
+    }
+  }
+
+  void resetFilteredCards() {
+    filteredCards.value = cards;
+  }
+
+  void filterCards(String searchText) {
+    if (searchText.isEmpty) {
+      resetFilteredCards();
+    } else {
+      filteredCards.value = cards.where((card) {
+        final thNameMatch = card.name.th.toLowerCase().contains(searchText.toLowerCase());
+        final enNameMatch = card.name.en.toLowerCase().contains(searchText.toLowerCase());
+        return thNameMatch || enNameMatch;
+      }).toList();
     }
   }
 }

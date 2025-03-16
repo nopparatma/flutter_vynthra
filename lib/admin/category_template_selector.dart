@@ -4,9 +4,9 @@ class CategoryTemplateSelector extends StatelessWidget {
   final Function(String thaiCategory, String englishCategory) onSelectTemplate;
 
   const CategoryTemplateSelector({
-    Key? key,
+    super.key,
     required this.onSelectTemplate,
-  }) : super(key: key);
+  });
 
   // Predefined category templates
   final List<Map<String, String>> _categoryTemplates = const [

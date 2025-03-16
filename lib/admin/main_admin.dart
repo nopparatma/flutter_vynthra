@@ -10,7 +10,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
           primary: Colors.purple,
           secondary: Colors.purpleAccent,
           surface: Color(0xFF303030),
-          background: Color(0xFF121212),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.purple,
@@ -54,7 +53,6 @@ class MyApp extends StatelessWidget {
           primary: Colors.purple,
           secondary: Colors.purpleAccent,
           surface: Color(0xFF303030),
-          background: Color(0xFF121212),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.purple,

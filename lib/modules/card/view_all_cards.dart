@@ -19,9 +19,12 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   final AppController appController = Get.find<AppController>();
   final ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
+  late bool? isFromSelectCardOnly;
 
   @override
   void initState() {
+    isFromSelectCardOnly = ArgumentUtil.getArgument<bool>('isFromSelectCardOnly');
+    appController.resetFilteredCards();
     super.initState();
   }
 
@@ -32,7 +35,6 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   }
 
   void onTapCard(CardModel cardItem) {
-    bool? isFromSelectCardOnly = ArgumentUtil.getArgument<bool>('isFromSelectCardOnly');
     if (isFromSelectCardOnly ?? false) {
       Navigator.pop(context, cardItem);
       return;
@@ -44,7 +46,7 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   @override
   Widget build(BuildContext context) {
     return CommonLayout(
-      title: 'ไพ่ทั้งหมด',
+      title: (isFromSelectCardOnly ?? false) ? 'เลือกไพ่' : 'ไพ่ทั้งหมด',
       isShowMenu: false,
       isShowBackAppBar: true,
       scrollController: scrollController,
@@ -68,13 +70,13 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
                               icon: const Icon(Icons.clear),
                               onPressed: () {
                                 searchController.clear();
-                                setState(() {});
+                                appController.filterCards('');
                               },
                             )
                           : null,
                     ),
                     onChanged: (value) {
-                      setState(() {});
+                      appController.filterCards(value);
                     },
                   ),
                 ),
@@ -88,8 +90,8 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
                       mainAxisSpacing: 10.0,
                     ),
                     delegate: SliverChildBuilderDelegate(
-                      childCount: appController.cards.length,
-                      (BuildContext context, int index) => _buildImageWithCaption(appController.cards[index]),
+                      childCount: appController.filteredCards.length,
+                      (BuildContext context, int index) => _buildImageWithCaption(appController.filteredCards[index]),
                     ),
                   ),
                 ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'prediction_form_field.dart';
 
 class DeityCardModel {
   final Map<String, String> name;
@@ -31,10 +29,10 @@ class DeityCardModel {
 }
 
 class DeityCardAdminPage extends StatefulWidget {
-  const DeityCardAdminPage({Key? key}) : super(key: key);
+  const DeityCardAdminPage({super.key});
 
   @override
-  _DeityCardAdminPageState createState() => _DeityCardAdminPageState();
+  createState() => _DeityCardAdminPageState();
 }
 
 class _DeityCardAdminPageState extends State<DeityCardAdminPage> {
@@ -631,12 +629,12 @@ class ContentFormField extends StatefulWidget {
   final Function(int) onRemove;
 
   const ContentFormField({
-    Key? key,
+    super.key,
     required this.index,
     required this.titlePrefix,
     required this.contentField,
     required this.onRemove,
-  }) : super(key: key);
+  });
 
   @override
   State<ContentFormField> createState() => _ContentFormFieldState();
