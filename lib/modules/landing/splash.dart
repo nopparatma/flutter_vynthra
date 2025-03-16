@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vynthra/app/app_controller.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:vynthra/widget/custom_loading.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -14,6 +16,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   late AppController _appController;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  String _version = '';
 
   @override
   void initState() {
@@ -30,8 +33,15 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
 
     _animationController.forward();
-
+    _getAppVersion();
     _initializeApp();
+  }
+
+  Future<void> _getAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = 'Version ${packageInfo.version}';
+    });
   }
 
   Future<void> _initializeApp() async {
@@ -55,6 +65,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     return Scaffold(
       body: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
@@ -66,86 +77,85 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
             ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            FadeTransition(
-              opacity: _animation,
-              child: ScaleTransition(
-                scale: _animation,
-                child: Center(
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 150,
+              child: FadeTransition(
+                opacity: _animation,
+                child: ScaleTransition(
+                  scale: _animation,
                   child: Image.asset('assets/images/vynthra_logo.png'),
                 ),
               ),
             ),
-            SizedBox(height: 24),
-            FadeTransition(
-              opacity: _animation,
-              child: Text(
-                'ยินดีต้อนรับ',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            SizedBox(height: 48),
-            Obx(() {
-              if (_appController.isLoading.value) {
-                return Column(
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      'กำลังโหลดข้อมูล...',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                );
-              }
-
-              if (_appController.errorMessage.value.isNotEmpty) {
-                return Column(
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      color: Colors.red.shade300,
-                      size: 48,
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'เกิดข้อผิดพลาด',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        _appController.errorMessage.value,
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 100,
+              child: Obx(() {
+                if (_appController.isLoading.value) {
+                  return Column(
+                    children: [
+                      CustomLoadingWidget(),
+                      SizedBox(height: 24),
+                      Text(
+                        'กำลังโหลดข้อมูล...',
                         style: Theme.of(context).textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
-                    ),
-                    SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () => _initializeApp(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.blue.shade700,
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                      ),
-                      child: Text(
-                        'ลองใหม่',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
-                  ],
-                );
-              }
+                    ],
+                  );
+                }
 
-              return SizedBox.shrink();
-            }),
+                if (_appController.errorMessage.value.isNotEmpty) {
+                  return Column(
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red.shade300,
+                        size: 48,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'เกิดข้อผิดพลาด',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 16),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () => _initializeApp(),
+                          child: Text(
+                            'ลองใหม่',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return SizedBox.shrink();
+              }),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 24,
+              child: FadeTransition(
+                opacity: _animation,
+                child: Text(
+                  _version,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           ],
         ),
       ),
