@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vynthra/app/app_theme.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'app/app_controller.dart';
 
@@ -17,6 +17,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: AppTheme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
+
     return GetMaterialApp(
       title: 'Vynthra',
       theme: AppTheme.darkTheme,
