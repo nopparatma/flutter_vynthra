@@ -20,7 +20,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     super.initState();
     _appController = Get.find<AppController>();
 
-    // Setup animation
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
@@ -32,18 +31,13 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     _animationController.forward();
 
-    // Initialize app config
     _initializeApp();
   }
 
   Future<void> _initializeApp() async {
-    await Future.delayed(Duration(milliseconds: 500));
-
     final success = await _appController.initializeApp();
 
     if (success) {
-      await Future.delayed(Duration(milliseconds: 1500));
-
       Get.offNamed(RoutePath.homePage);
     } else {
       setState(() {});
@@ -63,57 +57,38 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
             colors: [
-              Colors.blue.shade800,
-              Colors.blue.shade600,
-              Colors.blue.shade400,
+              Colors.blueGrey.shade900,
+              Colors.blueGrey.shade800,
+              Colors.grey.shade900,
             ],
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo หรือชื่อแอพ
             FadeTransition(
               opacity: _animation,
               child: ScaleTransition(
                 scale: _animation,
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.storage,
-                      size: 60,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
+                child: Center(
+                  child: Image.asset('assets/images/vynthra_logo.png'),
                 ),
               ),
             ),
             SizedBox(height: 24),
-
-            // ชื่อแอพ
             FadeTransition(
               opacity: _animation,
               child: Text(
-                'MongoDB Flutter',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                'ยินดีต้อนรับ',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ),
             SizedBox(height: 48),
-
-            // สถานะการโหลด
             Obx(() {
               if (_appController.isLoading.value) {
                 return Column(
@@ -124,10 +99,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                     SizedBox(height: 24),
                     Text(
                       'กำลังโหลดข้อมูล...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 );
@@ -144,21 +116,14 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                     SizedBox(height: 16),
                     Text(
                       'เกิดข้อผิดพลาด',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     SizedBox(height: 8),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 32),
                       child: Text(
                         _appController.errorMessage.value,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -170,7 +135,10 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                         foregroundColor: Colors.blue.shade700,
                         padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                       ),
-                      child: Text('ลองใหม่'),
+                      child: Text(
+                        'ลองใหม่',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
                   ],
                 );

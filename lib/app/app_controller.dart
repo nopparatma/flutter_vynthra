@@ -38,6 +38,8 @@ class AppController extends GetxController {
       await loadPositions();
       await loadCards();
 
+      await Future.delayed(Duration(milliseconds: 3000));
+
       return true;
     } catch (e) {
       errorMessage.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อ: $e';

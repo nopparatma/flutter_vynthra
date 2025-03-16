@@ -1,10 +1,11 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vynthra/app/app_theme.dart';
 import 'package:flutter_vynthra/models/card_model.dart';
 import 'package:flutter_vynthra/utils/argument_util.dart';
 import 'package:flutter_vynthra/utils/color_util.dart';
-import 'package:flutter_vynthra/widget/custom_app_bar.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter_vynthra/widget/common_layout.dart';
+import 'package:flutter_vynthra/widget/custom_loading.dart';
 
 class CardDetailPage extends StatefulWidget {
   const CardDetailPage({super.key});
@@ -44,45 +45,28 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    // Card image
-                    Center(
-                      child: Image.network(
-                        'https://vynthra.s3.ap-southeast-2.amazonaws.com/cards/placeholder-card.png',
-                        height: 300,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: Icon(Icons.image_not_supported, size: 50),
-                            ),
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: LoadingAnimationWidget.discreteCircle(
-                              color: Colors.deepPurpleAccent,
-                              size: 25,
-                            ),
-                          );
-                        },
-                      ),
+                    Image.network(
+                      cardItem?.imageUrl ?? "",
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(Icons.image_not_supported, size: 50),
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return CustomLoadingWidget();
+                      },
                     ),
-
-                    // Card title and chip
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 8),
-                          Chip(
-                            label: Text(cardItem?.cardSet.th ?? ""),
-                          )
-                        ],
-                      ),
-                    ),
+                    Chip(
+                        label: Text(
+                      cardItem?.cardSet.th ?? "",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )),
+                    SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -92,14 +76,14 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
                     controller: _tabController,
                     tabs: const [
                       Tab(text: 'รายละเอียด'),
-                      Tab(text: 'การพยากรณ์และคำทำนาย'),
+                      Tab(text: 'การพยากรณ์'),
                     ],
-                    labelStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    indicatorColor: Colors.deepPurpleAccent,
-                    labelColor: Colors.deepPurpleAccent,
+                    labelStyle: Theme.of(context).textTheme.titleMedium,
+                    indicatorColor: AppTheme.accentColor,
+                    labelColor: AppTheme.accentColor,
+                    indicatorSize: TabBarIndicatorSize.tab,
                     unselectedLabelColor: Colors.grey,
+                    dividerColor: AppTheme.dividerColor,
                   ),
                 ),
                 pinned: true,
@@ -109,12 +93,9 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
           body: TabBarView(
             controller: _tabController,
             children: [
-              // First Tab - รายละเอียด (Details)
               _buildTabContent(
                 cardItem?.description ?? [],
               ),
-
-              // Second Tab - การพยากรณ์และคำทำนาย (Prediction)
               _buildTabContent(
                 cardItem?.prediction ?? [],
               ),
@@ -153,26 +134,30 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
               scrollOnExpand: true,
               scrollOnCollapse: false,
               child: ExpandablePanel(
-                theme: const ExpandableThemeData(
+                theme: ExpandableThemeData(
                   headerAlignment: ExpandablePanelHeaderAlignment.center,
                   tapBodyToCollapse: true,
+                  tapBodyToExpand: true,
+                  iconColor: AppTheme.iconColorPrimary,
                 ),
                 header: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Text(
                       item.category.th,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     )),
                 collapsed: Text(
                   item.content.th,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   softWrap: true,
-                  maxLines: 5,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
                 expanded: Text(
                   item.content.th,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   softWrap: true,
                   overflow: TextOverflow.fade,
                 ),
@@ -195,7 +180,6 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
   }
 }
 
-// SliverPersistentHeaderDelegate for pinned tab bar
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   _SliverAppBarDelegate(this._tabBar);
 
@@ -210,7 +194,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: AppTheme.scaffoldBackgroundColor,
       child: _tabBar,
     );
   }

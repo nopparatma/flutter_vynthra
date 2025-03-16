@@ -99,6 +99,7 @@ class _RainbowBorderButtonState extends State<RainbowBorderButton> with SingleTi
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     if (widget.icon != null) ...[
                       Icon(
@@ -108,12 +109,14 @@ class _RainbowBorderButtonState extends State<RainbowBorderButton> with SingleTi
                       ),
                       const SizedBox(width: 8),
                     ],
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        widget.title,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
                   ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
+import 'package:flutter_vynthra/app/app_theme.dart';
 import 'package:flutter_vynthra/app/router.dart';
 import 'package:get/get.dart';
 
@@ -136,14 +137,19 @@ class _CommonLayoutState extends State<CommonLayout> with SingleTickerProviderSt
               childrenAnimation: ExpandableFabAnimation.none,
               distance: 70,
               overlayStyle: ExpandableFabOverlayStyle(
-                color: Colors.white.withOpacity(0.9),
-                blur: 2,
+                color: AppTheme.dialogBackgroundColor.withOpacity(0.9),
+                blur: 5,
               ),
               openCloseStackAlignment: Alignment.centerLeft,
               children: [
                 Row(
                   children: [
-                    const Text('ความหมายไพ่'),
+                    Text(
+                      'ไพ่ทั้งหมด',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                     const SizedBox(width: 20),
                     FloatingActionButton.large(
                       child: const Icon(Icons.card_giftcard),

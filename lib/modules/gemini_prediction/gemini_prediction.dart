@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vynthra/models/card_model.dart';
 import 'package:flutter_vynthra/models/position_model.dart';
 import 'package:flutter_vynthra/utils/argument_util.dart';
-import 'package:flutter_vynthra/widget/custom_app_bar.dart';
+import 'package:flutter_vynthra/widget/common_layout.dart';
+import 'package:flutter_vynthra/widget/custom_loading.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:get/get.dart';
 
@@ -99,7 +100,7 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
           ),
           child: HtmlWidget(
             controller.predictionHtml.value.isNotEmpty ? controller.predictionHtml.value : 'ไม่พบข้อมูลคำทำนาย',
-            textStyle: const TextStyle(fontSize: 16),
+            textStyle: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
         SizedBox(height: 50),
@@ -125,7 +126,10 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
         const SizedBox(height: 24),
         ElevatedButton(
           onPressed: controller.fetchPredictionData,
-          child: const Text('ลองใหม่อีกครั้ง'),
+          child: Text(
+            'ลองใหม่อีกครั้ง',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
       ],
     );
@@ -143,13 +147,7 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
             blinkDuration: const Duration(seconds: 1),
           ),
           const SizedBox(height: 32),
-          const Text(
-            'Loading...',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          CustomLoadingWidget(),
         ],
       ),
     );

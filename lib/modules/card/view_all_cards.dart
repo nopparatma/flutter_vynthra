@@ -4,9 +4,9 @@ import 'package:flutter_vynthra/app/app_controller.dart';
 import 'package:flutter_vynthra/app/router.dart';
 import 'package:flutter_vynthra/models/card_model.dart';
 import 'package:flutter_vynthra/utils/argument_util.dart';
-import 'package:flutter_vynthra/widget/custom_app_bar.dart';
+import 'package:flutter_vynthra/widget/common_layout.dart';
+import 'package:flutter_vynthra/widget/custom_loading.dart';
 import 'package:get/get.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class ViewAllCardsPage extends StatefulWidget {
   const ViewAllCardsPage({super.key});
@@ -59,8 +59,6 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
                     decoration: InputDecoration(
                       hintText: 'ค้นหาไพ่...',
                       prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -118,12 +116,7 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
             },
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
-              return Center(
-                child: LoadingAnimationWidget.discreteCircle(
-                  color: Colors.deepPurpleAccent,
-                  size: 25,
-                ),
-              );
+              return CustomLoadingWidget();
             },
           ),
           Positioned(

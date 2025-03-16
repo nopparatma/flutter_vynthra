@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_vynthra/app/app_theme.dart';
 import 'package:flutter_vynthra/app/router.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -18,10 +19,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Vynthra',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.darkTheme,
       getPages: AppRouter.routes,
       initialRoute: RoutePath.splashPage,
     );

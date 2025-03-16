@@ -3,7 +3,7 @@ import 'package:flutter_vynthra/app/app_controller.dart';
 import 'package:flutter_vynthra/app/router.dart';
 import 'package:flutter_vynthra/models/card_model.dart';
 import 'package:flutter_vynthra/models/position_model.dart';
-import 'package:flutter_vynthra/widget/custom_app_bar.dart';
+import 'package:flutter_vynthra/widget/common_layout.dart';
 import 'package:flutter_vynthra/widget/rainbow_border_button.dart';
 import 'package:get/get.dart';
 
@@ -17,20 +17,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AppController appController = Get.find<AppController>();
   final ScrollController scrollController = ScrollController();
-
-  final String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-  late List<Map<String, dynamic>> mockSummaryMeanings = [];
   final Map<String, CardModel> selectedCards = {};
 
   @override
   void initState() {
     super.initState();
-
-    mockSummaryMeanings = [
-      {"id": 1, "colorCode": "#007BFF", "header": "การงาน", "body": loremIpsum},
-      {"id": 2, "colorCode": "#28A745", "header": "การเงิน", "body": loremIpsum},
-      {"id": 3, "colorCode": "#FF4D6D", "header": "ความรัก", "body": loremIpsum},
-    ];
   }
 
   @override
@@ -61,7 +52,12 @@ class _HomePageState extends State<HomePage> {
     if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('ไพ่ "${cardItemSelected.name.th}" ถูกเลือกไปแล้ว\nกรุณาเลือกไพ่อื่น'),
+          content: Text(
+            'ไพ่ "${cardItemSelected.name.th}" ถูกเลือกไปแล้ว\nกรุณาเลือกไพ่อื่น',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),
         ),
@@ -103,6 +99,7 @@ class _HomePageState extends State<HomePage> {
     return InkWell(
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.white30,
           borderRadius: BorderRadius.circular(16.0),
           border: Border.all(
             color: Colors.grey,
@@ -119,10 +116,9 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     selectedCards[position.id]?.name.th ?? "",
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   SizedBox(height: 8),
                   RainbowBorderButton(
@@ -169,10 +165,9 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                 child: Text(
                   "${position.seq}. ${position.name.th}",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
             ),
