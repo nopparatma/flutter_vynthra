@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_vynthra/app/app_theme.dart';
+import 'package:vynthra/app/app_theme.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class CustomLoadingWidget extends StatelessWidget {

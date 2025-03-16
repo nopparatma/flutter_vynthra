@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_vynthra/models/card_model.dart';
-import 'package:flutter_vynthra/models/position_model.dart';
-import 'package:flutter_vynthra/services/mongo_connector.dart';
+import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/models/position_model.dart';
+import 'package:vynthra/services/mongo_connector.dart';
 import 'package:get/get.dart';
 
 class AppController extends GetxController {

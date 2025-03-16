@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_vynthra/modules/card/card_detail.dart';
-import 'package:flutter_vynthra/modules/card/view_all_cards.dart';
-import 'package:flutter_vynthra/modules/gemini_prediction/gemini_prediction.dart';
-import 'package:flutter_vynthra/modules/landing/home.dart';
-import 'package:flutter_vynthra/modules/landing/splash.dart';
+import 'package:vynthra/modules/card/card_detail.dart';
+import 'package:vynthra/modules/card/view_all_cards.dart';
+import 'package:vynthra/modules/gemini_prediction/gemini_prediction.dart';
+import 'package:vynthra/modules/landing/home.dart';
+import 'package:vynthra/modules/landing/splash.dart';
 import 'package:get/get.dart';
 
 class RoutePath {

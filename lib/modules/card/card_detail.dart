@@ -1,11 +1,11 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_vynthra/app/app_theme.dart';
-import 'package:flutter_vynthra/models/card_model.dart';
-import 'package:flutter_vynthra/utils/argument_util.dart';
-import 'package:flutter_vynthra/utils/color_util.dart';
-import 'package:flutter_vynthra/widget/common_layout.dart';
-import 'package:flutter_vynthra/widget/custom_loading.dart';
+import 'package:vynthra/app/app_theme.dart';
+import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/utils/argument_util.dart';
+import 'package:vynthra/utils/color_util.dart';
+import 'package:vynthra/widget/common_layout.dart';
+import 'package:vynthra/widget/custom_loading.dart';
 
 class CardDetailPage extends StatefulWidget {
   const CardDetailPage({super.key});

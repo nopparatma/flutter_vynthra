@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:flutter_vynthra/app/app_controller.dart';
-import 'package:flutter_vynthra/app/router.dart';
-import 'package:flutter_vynthra/models/card_model.dart';
-import 'package:flutter_vynthra/utils/argument_util.dart';
-import 'package:flutter_vynthra/widget/common_layout.dart';
-import 'package:flutter_vynthra/widget/custom_loading.dart';
+import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/router.dart';
+import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/utils/argument_util.dart';
+import 'package:vynthra/widget/common_layout.dart';
+import 'package:vynthra/widget/custom_loading.dart';
 import 'package:get/get.dart';
 
 class ViewAllCardsPage extends StatefulWidget {

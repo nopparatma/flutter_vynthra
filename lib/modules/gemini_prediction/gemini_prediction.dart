@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_vynthra/models/card_model.dart';
-import 'package:flutter_vynthra/models/position_model.dart';
-import 'package:flutter_vynthra/utils/argument_util.dart';
-import 'package:flutter_vynthra/widget/common_layout.dart';
-import 'package:flutter_vynthra/widget/custom_loading.dart';
+import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/models/position_model.dart';
+import 'package:vynthra/utils/argument_util.dart';
+import 'package:vynthra/widget/common_layout.dart';
+import 'package:vynthra/widget/custom_loading.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:get/get.dart';
 

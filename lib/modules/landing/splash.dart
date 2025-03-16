@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_vynthra/app/app_controller.dart';
-import 'package:flutter_vynthra/app/router.dart';
+import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
 
 class SplashPage extends StatefulWidget {

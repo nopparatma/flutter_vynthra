@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
-import 'package:flutter_vynthra/app/app_theme.dart';
-import 'package:flutter_vynthra/app/router.dart';
+import 'package:vynthra/app/app_theme.dart';
+import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
 
 class CommonLayout extends StatefulWidget {

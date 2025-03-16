@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_vynthra/app/app_controller.dart';
-import 'package:flutter_vynthra/app/router.dart';
-import 'package:flutter_vynthra/models/card_model.dart';
-import 'package:flutter_vynthra/models/position_model.dart';
-import 'package:flutter_vynthra/widget/common_layout.dart';
-import 'package:flutter_vynthra/widget/rainbow_border_button.dart';
+import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/router.dart';
+import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/models/position_model.dart';
+import 'package:vynthra/widget/common_layout.dart';
+import 'package:vynthra/widget/rainbow_border_button.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
