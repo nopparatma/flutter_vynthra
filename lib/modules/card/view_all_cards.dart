@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/app_theme.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/utils/argument_util.dart';
@@ -98,8 +99,8 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
                     padding: const EdgeInsets.all(8.0),
                     sliver: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1,
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.5,
                         crossAxisSpacing: 10.0,
                         mainAxisSpacing: 10.0,
                       ),
@@ -119,44 +120,20 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
   Widget _buildImageWithCaption(CardModel cardItem) {
     return InkWell(
       onTap: () => onTapCard(cardItem),
-      child: Stack(
-        children: [
-          Image.network(
-            cardItem.imageUrl,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey[300],
-                child: const Center(
-                  child: Icon(Icons.image_not_supported, size: 50),
-                ),
-              );
-            },
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return CustomLoadingWidget();
-            },
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              color: Colors.black.withOpacity(0.5),
-              child: Text(
-                cardItem.name.th,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+      child: Image.network(
+        cardItem.imageUrl,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: AppTheme.primaryColor,
+            child: const Center(
+              child: Icon(Icons.image_not_supported, size: 50),
             ),
-          ),
-        ],
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return CustomLoadingWidget();
+        },
       ),
     );
   }

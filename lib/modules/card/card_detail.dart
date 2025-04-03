@@ -45,28 +45,34 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    Image.network(
-                      cardItem?.imageUrl ?? "",
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, size: 50),
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return CustomLoadingWidget();
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(
+                        cardItem?.imageUrl ?? "",
+                        fit: BoxFit.fitHeight,
+                        height: 300,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            height: 300,
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported, size: 50),
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return CustomLoadingWidget();
+                        },
+                      ),
                     ),
+                    SizedBox(height: 8),
                     Chip(
                         label: Text(
                       cardItem?.cardSet.th ?? "",
                       style: Theme.of(context).textTheme.titleMedium,
                     )),
-                    SizedBox(height: 16),
+                    SizedBox(height: 8),
                   ],
                 ),
               ),

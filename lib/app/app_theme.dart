@@ -1,49 +1,39 @@
 import 'package:flutter/material.dart';
 
-// ธีมสีหลักสำหรับแอปทั้งหมด
 class AppTheme {
-  // สีหลัก (Primary colors)
   static const MaterialColor primarySwatch = Colors.blueGrey;
   static final Color primaryColor = Colors.blueGrey.shade800;
   static final Color primaryColorDark = Colors.blueGrey.shade900;
   static final Color primaryColorLight = Colors.blueGrey.shade700;
 
-  // สีรอง (Accent/Secondary colors)
-  static final Color accentColor = Colors.teal.shade400; // สีตัดที่ดูสดใส
+  static final Color accentColor = Colors.teal.shade400;
   static final Color secondaryColor = Colors.teal.shade600;
 
-  // สีพื้นหลัง (Background colors)
-  static final Color scaffoldBackgroundColor = Color(0xFF121212); // สีพื้นหลังเกือบดำ
-  static final Color backgroundColor = Color(0xFF1E1E1E); // สีพื้นหลังดำอมเทา
+  static final Color scaffoldBackgroundColor = Color(0xFF121212);
+  static final Color backgroundColor = Color(0xFF1E1E1E);
   static final Color cardColor = Colors.grey.shade900;
   static final Color dialogBackgroundColor = Color(0xFF252525);
 
-  // สีข้อความ (Text colors)
   static const Color textColorPrimary = Colors.white;
   static final Color textColorSecondary = Colors.grey.shade300;
   static final Color textColorHint = Colors.grey.shade500;
   static final Color textColorDisabled = Colors.grey.shade700;
 
-  // สีไอคอน (Icon colors)
   static const Color iconColorPrimary = Colors.white;
   static final Color iconColorSecondary = Colors.grey.shade400;
 
-  // สีขอบ (Border colors)
   static final Color borderColor = Colors.grey.shade800;
   static final Color dividerColor = Colors.grey.shade800;
 
-  // สีปุ่ม (Button colors)
   static final Color buttonPrimaryColor = Colors.blueGrey.shade700;
   static final Color buttonSecondaryColor = Colors.teal.shade600;
   static final Color buttonDisabledColor = Colors.grey.shade800;
 
-  // สีสถานะ (Status colors)
   static final Color successColor = Colors.green.shade400;
   static final Color errorColor = Colors.red.shade400;
   static final Color warningColor = Colors.amber.shade400;
   static final Color infoColor = Colors.blue.shade400;
 
-  // ========== Gradient ที่คุณเลือกไว้ ==========
   static final Gradient mainGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
@@ -54,7 +44,6 @@ class AppTheme {
     ],
   );
 
-  // Gradient เพิ่มเติมที่เข้ากับธีม
   static final Gradient secondaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -73,7 +62,6 @@ class AppTheme {
     ],
   );
 
-  // ========== ThemeData สำหรับใช้งานใน MaterialApp ==========
   static ThemeData darkTheme = ThemeData(
     fontFamily: 'Cloud',
     brightness: Brightness.dark,
