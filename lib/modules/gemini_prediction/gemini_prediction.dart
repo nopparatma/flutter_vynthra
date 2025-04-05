@@ -7,7 +7,7 @@ import 'package:vynthra/widget/custom_loading.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:get/get.dart';
 
-import 'gemini_loading_animation.dart';
+import 'widgets/gemini_loading_animation.dart';
 import 'gemini_prediction_controller.dart';
 
 class GeminiPredictionPage extends StatefulWidget {

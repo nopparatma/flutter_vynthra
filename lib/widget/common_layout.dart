@@ -6,7 +6,7 @@ import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
 
 class CommonLayout extends StatefulWidget {
-  final String title;
+  final String? title;
   final Widget body;
   final bool isShowMenu;
   final bool isShowBackAppBar;
@@ -15,10 +15,10 @@ class CommonLayout extends StatefulWidget {
 
   const CommonLayout({
     super.key,
-    required this.title,
+    this.title,
     required this.body,
     required this.scrollController,
-    this.isShowMenu = true,
+    this.isShowMenu = false,
     this.isShowBackAppBar = false,
     this.action,
   });
@@ -105,7 +105,13 @@ class _CommonLayoutState extends State<CommonLayout> with SingleTickerProviderSt
           title: AnimatedOpacity(
             opacity: _showTitle ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 150),
-            child: Text(widget.title),
+            child: widget.title != null
+                ? Text(widget.title ?? '')
+                : Image.asset(
+                    'assets/images/vynthra_logo.png',
+                    fit: BoxFit.fitHeight,
+                    height: kToolbarHeight - 8,
+                  ),
           ),
           leading: Visibility(
             visible: widget.isShowBackAppBar && _showTitle,

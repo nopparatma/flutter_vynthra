@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
-import 'package:vynthra/modules/gemini_prediction/prompt_ai.dart';
+import 'package:vynthra/modules/gemini_prediction/models/prompt_ai.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
