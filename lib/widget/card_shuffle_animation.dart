@@ -2,22 +2,24 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vynthra/app/app_theme.dart';
+import 'package:vynthra/models/card_model.dart';
 
 class CardShuffleAnimation extends StatefulWidget {
   const CardShuffleAnimation({
-    Key? key,
+    super.key,
     required this.isAnimating,
     required this.onAnimationComplete,
-    this.spinDurationMs = 3000, // ระยะเวลาการหมุน (มิลลิวินาที)
-    this.effectsDurationMs = 5000, // ระยะเวลาเอฟเฟกต์ (มิลลิวินาที)
-    this.pauseDurationMs = 0, // ระยะเวลาหยุดระหว่างหมุนกับแสดงเอฟเฟกต์ (มิลลิวินาที)
-    this.endDelayMs = 0, // ระยะเวลารอก่อนจบ (มิลลิวินาที)
-  }) : super(key: key);
+    required this.cards,
+    this.spinDurationMs = 3000,
+    this.effectsDurationMs = 5000,
+    this.pauseDurationMs = 0,
+    this.endDelayMs = 0,
+  });
 
   final bool isAnimating;
-  final VoidCallback onAnimationComplete;
+  final Function(int selectedCardIndex) onAnimationComplete;
+  final List<CardModel> cards;
 
-  // พารามิเตอร์กำหนดเวลา
   final int spinDurationMs;
   final int effectsDurationMs;
   final int pauseDurationMs;
@@ -28,21 +30,19 @@ class CardShuffleAnimation extends StatefulWidget {
 }
 
 class _CardShuffleAnimationState extends State<CardShuffleAnimation> with TickerProviderStateMixin {
-  // Animation controllers
   late AnimationController reelController;
   late Animation<double> reelPositionAnimation;
   late Animation<double> reelBlurAnimation;
 
-  // Flash and glow effects
   late AnimationController effectsController;
   late Animation<double> glowAnimation;
   late Animation<double> flashAnimation;
 
-  // Number of card images in the reel
   final int imagesPerReel = 15;
 
-  // Card selection for final result
   int selectedCardIndex = 0;
+
+  List<int> cardIndices = [];
 
   bool _internalAnimating = false;
 
@@ -51,7 +51,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
     super.initState();
     _initAnimations();
 
-    // Start animation when isAnimating changes to true
     if (widget.isAnimating && !_internalAnimating) {
       _startAnimation();
     }
@@ -61,43 +60,36 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
   void didUpdateWidget(CardShuffleAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // ถ้ามีการเปลี่ยนแปลงค่าระยะเวลา ให้สร้าง animations ใหม่
     if (widget.spinDurationMs != oldWidget.spinDurationMs || widget.effectsDurationMs != oldWidget.effectsDurationMs) {
-      // ต้องกำจัด controllers เก่าก่อน
       reelController.dispose();
       effectsController.dispose();
-      // สร้าง animations ใหม่
       _initAnimations();
     }
 
-    // Check if the animation flag changed
     if (widget.isAnimating && !oldWidget.isAnimating && !_internalAnimating) {
       _startAnimation();
     }
   }
 
   void _initAnimations() {
-    // Single reel controller - ใช้ค่าระยะเวลาจาก widget
     reelController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: widget.spinDurationMs),
     );
 
-    // Reel position animation - simulate slot machine spinning
     reelPositionAnimation = Tween<double>(
       begin: 0.0,
-      end: 20.0 * imagesPerReel.toDouble(), // Spin multiple times
+      end: 20.0 * imagesPerReel.toDouble(),
     ).animate(
       CurvedAnimation(
         parent: reelController,
-        curve: Curves.easeOutBack, // Slow down at the end like a real slot machine
+        curve: Curves.easeOutBack,
       ),
     );
 
-    // Blur effect for spinning reel
     reelBlurAnimation = Tween<double>(
-      begin: 5.0, // Start blurry
-      end: 0.0, // End clear
+      begin: 5.0,
+      end: 0.0,
     ).animate(
       CurvedAnimation(
         parent: reelController,
@@ -105,7 +97,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
       ),
     );
 
-    // Effects controller for glow and flash - ใช้ค่าระยะเวลาจาก widget
     effectsController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: widget.effectsDurationMs),
@@ -131,33 +122,34 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
 
     _internalAnimating = true;
 
-    // Reset animations
     effectsController.reset();
     reelController.reset();
 
-    // Randomly select final card index
-    final random = Random();
-    selectedCardIndex = random.nextInt(6); // Assuming 6 different card types
+    _generateRandomCardIndices();
 
-    // Start reel spinning
+    final random = Random();
+    selectedCardIndex = widget.cards.isEmpty ? 0 : random.nextInt(widget.cards.length);
+
     reelController.forward();
 
-    // รอให้การหมุนเสร็จสิ้น (ใช้ await)
     await reelController.forward();
 
-    // Small pause for drama - ใช้ค่าระยะเวลาจาก widget
     await Future.delayed(Duration(milliseconds: widget.pauseDurationMs));
 
-    // Play success effects
     effectsController.forward();
 
-    // Wait for effects to play - ใช้ค่าระยะเวลาจาก widget
     await Future.delayed(Duration(milliseconds: widget.endDelayMs));
 
     _internalAnimating = false;
 
-    // Notify parent that animation is complete
-    widget.onAnimationComplete();
+    widget.onAnimationComplete(selectedCardIndex);
+  }
+
+  void _generateRandomCardIndices() {
+    if (widget.cards.isEmpty) return;
+
+    final random = Random();
+    cardIndices = List.generate(imagesPerReel, (index) => random.nextInt(widget.cards.length));
   }
 
   @override
@@ -168,11 +160,95 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
   }
 
   Widget _buildCardImage(int index, BoxConstraints constraints) {
-    // Calculate dimensions based on constraints
     final width = constraints.maxWidth;
     final height = constraints.maxHeight;
 
-    // Different card styles based on index
+    if (widget.cards.isEmpty) {
+      return _buildFallbackCard(index, width, height);
+    }
+
+    final cardIndex = index % widget.cards.length;
+    final card = widget.cards[cardIndex];
+
+    return Container(
+      width: width,
+      height: height,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(width * 0.06),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(width * 0.06),
+        child: Image.network(
+          card.imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildCardWithName(card, width, height);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardWithName(CardModel card, double width, double height) {
+    final int asciiValue = card.name.en.isEmpty
+        ? card.name.th.isEmpty
+            ? 65
+            : card.name.th.codeUnitAt(0)
+        : card.name.en.codeUnitAt(0);
+
+    final hue = (asciiValue % 360).toDouble();
+    final startColor = HSLColor.fromAHSL(1.0, hue, 0.7, 0.4).toColor();
+    final endColor = HSLColor.fromAHSL(1.0, (hue + 40) % 360, 0.7, 0.5).toColor();
+
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(width * 0.06),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [startColor, endColor],
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(width * 0.08),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: Colors.white.withOpacity(0.9),
+                size: width * 0.2,
+              ),
+              SizedBox(height: height * 0.05),
+              Text(
+                card.name.th.isNotEmpty ? card.name.th : card.name.en,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.1,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFallbackCard(int index, double width, double height) {
     final cardColors = [
       [Colors.red.shade700, Colors.redAccent.shade700],
       [Colors.purple.shade800, Colors.purpleAccent.shade700],
@@ -184,23 +260,16 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
 
     final colorPair = cardColors[index % cardColors.length];
 
-    // ปรับขนาดไพ่ให้พอดีกับพื้นที่ที่ได้รับ
-    final cardWidth = width;
-    final cardHeight = height;
-
     return Container(
       width: width,
       height: height,
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(width * 0.06), // ปรับขนาด borderRadius ตามสัดส่วน
+        borderRadius: BorderRadius.circular(width * 0.06),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            colorPair[0],
-            colorPair[1],
-          ],
+          colors: [colorPair[0], colorPair[1]],
         ),
         boxShadow: [
           BoxShadow(
@@ -213,8 +282,8 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
       ),
       child: Center(
         child: Container(
-          width: cardWidth,
-          height: cardHeight,
+          width: width,
+          height: height,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(width * 0.05),
             border: Border.all(
@@ -237,7 +306,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                 Icon(
                   Icons.auto_awesome,
                   color: Colors.white.withOpacity(0.9),
-                  size: width * 0.25, // ปรับขนาดไอคอนตามขนาดไพ่
+                  size: width * 0.25,
                 ),
                 SizedBox(height: height * 0.05),
                 Text(
@@ -245,7 +314,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontWeight: FontWeight.bold,
-                    fontSize: width * 0.12, // ปรับขนาดตัวอักษรตามขนาดไพ่
+                    fontSize: width * 0.12,
                   ),
                 )
               ],
@@ -256,28 +325,23 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
     );
   }
 
-  // Build a single reel for the slot machine that fills the container
   Widget _buildReel(double position, double blur, BoxConstraints constraints) {
     final cardPositions = <Widget>[];
 
-    // Calculate card dimensions based on container size
     final width = constraints.maxWidth;
     final height = constraints.maxHeight;
     final cardHeight = height;
-    final cardMargin = 8.0; // ระยะห่างระหว่างไพ่
+    final cardMargin = 8.0;
     final totalCardHeight = cardHeight + cardMargin;
 
-    // Add cards to the reel
     for (int i = 0; i < imagesPerReel; i++) {
-      // Calculate card index - use the selected card at the end
       int cardIndex;
       if (reelController.isCompleted) {
-        cardIndex = (i == imagesPerReel ~/ 2) ? selectedCardIndex : (i + selectedCardIndex) % 6;
+        cardIndex = (i == imagesPerReel ~/ 2) ? selectedCardIndex : cardIndices[i % cardIndices.length];
       } else {
-        cardIndex = (i + position.floor()) % 6;
+        cardIndex = cardIndices[i % cardIndices.length];
       }
 
-      // Calculate position offset
       double offset = (i * totalCardHeight) - (position % 1.0) * totalCardHeight;
 
       cardPositions.add(
@@ -327,7 +391,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
           animation: Listenable.merge([reelController, effectsController]),
           builder: (context, child) {
             return Container(
-              // Container จะยืดเต็มพื้นที่ที่ได้รับจาก parent
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
@@ -343,7 +406,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
               ),
               child: Stack(
                 children: [
-                  // Slot machine reel in the center
                   Positioned.fill(
                     child: Center(
                       child: _buildReel(
@@ -356,8 +418,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                       ),
                     ),
                   ),
-
-                  // Flash effect overlay
                   if (flashAnimation.value > 0)
                     Positioned.fill(
                       child: Opacity(
@@ -373,8 +433,6 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                         ),
                       ),
                     ),
-
-                  // Success message at the bottom
                   Positioned(
                     bottom: 0,
                     left: 0,

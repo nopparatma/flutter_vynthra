@@ -43,20 +43,39 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
 
     setState(() {
       isAnimating = true;
-      selectedCard = null; // Hide the current card during animation
+      selectedCard = null;
     });
   }
 
-  // จะถูกเรียกเมื่อแอนิเมชันเสร็จสิ้น
-  void _onAnimationComplete() {
-    // เลือกไพ่สุ่ม
-    final random = Random();
-    final randomIndex = random.nextInt(appController.cards.length);
+  List<CardModel> _getShuffleCards() {
+    List<CardModel> shuffleCards = appController.cards;
 
-    setState(() {
-      selectedCard = appController.cards[randomIndex];
-      isAnimating = false;
-    });
+    return shuffleCards;
+  }
+
+  void _onAnimationComplete(int selectedCardIndex) {
+    final shuffleCards = _getShuffleCards();
+
+    if (shuffleCards.isEmpty) {
+      setState(() {
+        isAnimating = false;
+      });
+      return;
+    }
+
+    if (selectedCardIndex >= 0 && selectedCardIndex < shuffleCards.length) {
+      setState(() {
+        selectedCard = shuffleCards[selectedCardIndex];
+        isAnimating = false;
+      });
+    } else {
+      final random = Random();
+      final randomIndex = random.nextInt(shuffleCards.length);
+      setState(() {
+        selectedCard = shuffleCards[randomIndex];
+        isAnimating = false;
+      });
+    }
   }
 
   void _predictFortune() {
@@ -72,8 +91,18 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
       return;
     }
 
-    // ตรงนี้คุณสามารถทำการทำนายได้
-    // ...
+    if (selectedCard == null) {
+      Get.snackbar(
+        'กรุณาเลือกไพ่',
+        'โปรดสุ่มไพ่ก่อนทำนาย',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    // TODO: goto AI page
   }
 
   @override
@@ -101,14 +130,11 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ส่วนกรอกคำถาม
                     QuestionInputSection(
                       textController: textController,
                       textFocusNode: textFocusNode,
                     ),
                     const SizedBox(height: 16),
-
-                    // ส่วนแสดงไพ่
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -117,8 +143,6 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
-
-                        // พื้นที่ตรงกลางสำหรับการแสดงไพ่หรือการสุ่ม
                         Center(
                           child: GestureDetector(
                             onTap: isAnimating ? null : _randomizeCard,
@@ -126,24 +150,23 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                               width: 200,
                               height: 300,
                               decoration: BoxDecoration(
-                                color: isAnimating ? null : Colors.white.withOpacity(0.1),
+                                color: isAnimating || selectedCard != null ? null : Colors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isAnimating || selectedCard != null ? Colors.transparent : Colors.grey,
                                   width: 2,
                                 ),
                               ),
-                              // ใช้ isAnimating เพื่อสลับระหว่างการแสดงปกติและแอนิเมชัน
                               child: isAnimating
                                   ? CardShuffleAnimation(
                                       isAnimating: isAnimating,
                                       onAnimationComplete: _onAnimationComplete,
+                                      cards: _getShuffleCards(),
                                     )
                                   : _buildCardDisplay(),
                             ),
                           ),
                         ),
-
                         if (selectedCard != null && !isAnimating) ...[
                           const SizedBox(height: 16),
                           Center(
@@ -162,10 +185,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                         ],
                       ],
                     ),
-
                     const SizedBox(height: 24),
-
-                    // ปุ่มทำนาย
                     RainbowBorderButton(
                       title: 'ทำนาย',
                       icon: Icons.auto_awesome_outlined,
@@ -181,7 +201,6 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
     );
   }
 
-  // Widget แสดงไพ่หรือข้อความให้กดสุ่ม
   Widget _buildCardDisplay() {
     if (selectedCard != null) {
       return Column(
@@ -192,11 +211,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
               selectedCard!.imageUrl,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.auto_awesome,
-                  size: 40,
-                  color: Colors.amber,
-                );
+                return _buildCardFallback();
               },
             ),
           )
@@ -220,9 +235,56 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
       );
     }
   }
+
+  Widget _buildCardFallback() {
+    if (selectedCard == null) return const SizedBox();
+
+    final String nameText = selectedCard!.name.th.isNotEmpty ? selectedCard!.name.th : selectedCard!.name.en;
+
+    final int asciiValue = nameText.isEmpty ? 65 : nameText.codeUnitAt(0);
+    final hue = (asciiValue % 360).toDouble();
+
+    final startColor = HSLColor.fromAHSL(1.0, hue, 0.7, 0.4).toColor();
+    final endColor = HSLColor.fromAHSL(1.0, (hue + 40) % 360, 0.7, 0.5).toColor();
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [startColor, endColor],
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 40,
+              ),
+              SizedBox(height: 16),
+              Text(
+                nameText,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-// คลาสแยกสำหรับส่วนกรอกคำถาม
 class QuestionInputSection extends StatelessWidget {
   final TextEditingController textController;
   final FocusNode textFocusNode;
@@ -239,12 +301,12 @@ class QuestionInputSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'คำถามของคุณ',
+          'สิ่งที่ต้องการอยากรู้',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
-          'ตัวอย่างคำถาม: "ฉันควรเปลี่ยนงานไหม?", "ความรักของฉันจะเป็นอย่างไร?"',
+          'ตัวอย่าง: "ธุรกิจจะประสบความสำเร็จหรือไม่?"',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),
@@ -265,7 +327,7 @@ class QuestionInputSection extends StatelessWidget {
             focusNode: textFocusNode,
             style: Theme.of(context).textTheme.bodyLarge,
             decoration: const InputDecoration(
-              hintText: 'พิมพ์คำถามที่คุณต้องการคำตอบ...',
+              hintText: 'พิมพ์สิ่งที่คุณอยากรู้...',
               contentPadding: EdgeInsets.all(16),
               border: InputBorder.none,
             ),
