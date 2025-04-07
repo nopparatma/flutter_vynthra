@@ -173,8 +173,8 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                           child: GestureDetector(
                             onTap: isAnimating ? null : _randomizeCard,
                             child: Container(
-                              width: 200,
-                              height: 300,
+                              width: 150,
+                              height: 250,
                               decoration: BoxDecoration(
                                 color: isAnimating || selectedCard != null ? null : Colors.white.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(16),
@@ -211,7 +211,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                         ],
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     RainbowBorderButton(
                       title: 'ทำนาย',
                       icon: Icons.auto_awesome_outlined,
