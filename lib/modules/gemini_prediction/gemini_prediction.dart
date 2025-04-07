@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
+import 'package:vynthra/modules/gemini_prediction/constants.dart';
 import 'package:vynthra/utils/argument_util.dart';
 import 'package:vynthra/widget/common_layout.dart';
 import 'package:vynthra/widget/custom_loading.dart';
@@ -21,17 +22,23 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
   final ScrollController scrollController = ScrollController();
   late PositionModel? positionItem;
   late CardModel? cardItem;
+  late PromptType? promptType;
+  late String? question;
   late GeminiPredictionController geminiPredictionController;
 
   @override
   void initState() {
     positionItem = ArgumentUtil.getArgument<PositionModel>('positionItem');
     cardItem = ArgumentUtil.getArgument<CardModel>('cardItem');
+    promptType = ArgumentUtil.getArgument<PromptType>('promptType');
+    question = ArgumentUtil.getArgument<String>('question');
 
     geminiPredictionController = Get.put(
       GeminiPredictionController(
         positionItem: positionItem,
         cardItem: cardItem,
+        question: question,
+        promptType: promptType,
       ),
     );
 

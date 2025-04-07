@@ -14,10 +14,14 @@ class GeminiPredictionController extends GetxController {
 
   final PositionModel? positionItem;
   final CardModel? cardItem;
+  final String? question;
+  final PromptType? promptType;
 
   GeminiPredictionController({
-    required this.positionItem,
-    required this.cardItem,
+    this.positionItem,
+    this.cardItem,
+    this.question,
+    required this.promptType,
   });
 
   @override
@@ -31,18 +35,17 @@ class GeminiPredictionController extends GetxController {
     errorMessage.value = '';
 
     try {
-      const String apiKey = 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA';
-
       final model = GenerativeModel(
         model: 'gemini-2.0-flash-lite',
-        apiKey: apiKey,
+        apiKey: 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA',
       );
 
       final String prompt = PromptAi(
         cardItem: cardItem,
         positionItem: positionItem,
-        htmlExample: htmlDataFromAIExample,
-      ).generatePrompt();
+        question: question,
+        promptType: promptType,
+      ).getPrompt();
       debugPrint('Prompt: $prompt');
 
       final content = [Content.text(prompt)];
@@ -60,7 +63,6 @@ class GeminiPredictionController extends GetxController {
         errorMessage.value = 'ไม่มีข้อมูลคำทำนายจาก AI';
       }
     } catch (e) {
-      // errorMessage.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อ AI กรุณาลองใหม่อีกครั้ง';
       debugPrint('Exception: $e');
       errorMessage.value = 'Exception: $e';
     } finally {

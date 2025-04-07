@@ -2,7 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:vynthra/app/app_controller.dart';
 import 'package:vynthra/app/app_theme.dart';
+import 'package:vynthra/app/router.dart';
 import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/modules/gemini_prediction/constants.dart';
 import 'package:vynthra/widget/card_shuffle_animation.dart';
 import 'package:vynthra/widget/common_layout.dart';
 import 'package:vynthra/widget/rainbow_border_button.dart';
@@ -82,8 +84,8 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
     final question = textController.text.trim();
     if (question.isEmpty) {
       Get.snackbar(
-        'กรุณากรอกคำถาม',
-        'โปรดพิมพ์คำถามที่คุณต้องการคำตอบก่อนทำนาย',
+        'กรุณากรอกสิ่งที่คุณอยากรู้',
+        'โปรดพิมพ์สิ่งที่คุณอยากรู้ก่อนทำนาย',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withOpacity(0.8),
         colorText: Colors.white,
@@ -102,7 +104,14 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
       return;
     }
 
-    // TODO: goto AI page
+    Get.toNamed(
+      RoutePath.geminiPrediction,
+      arguments: {
+        'cardItem': selectedCard,
+        'question': question,
+        'promptType': PromptType.fortune,
+      },
+    );
   }
 
   @override
