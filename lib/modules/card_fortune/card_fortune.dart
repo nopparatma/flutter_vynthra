@@ -41,6 +41,18 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
   }
 
   void _randomizeCard() {
+    final question = textController.text.trim();
+    if (question.isEmpty) {
+      Get.snackbar(
+        'กรุณากรอกสิ่งที่คุณอยากรู้',
+        'โปรดพิมพ์สิ่งที่คุณอยากรู้ก่อนสุ่มไพ่',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     if (appController.cards.isEmpty || isAnimating) return;
 
     setState(() {
@@ -50,7 +62,12 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
   }
 
   List<CardModel> _getShuffleCards() {
-    List<CardModel> shuffleCards = appController.cards;
+    if (appController.cards.isEmpty) return [];
+
+    List<CardModel> shuffleCards = appController.cards.where((card) {
+      String thName = card.name.th.toLowerCase();
+      return thName.contains("พระพิฆเนศ") || thName.contains("พระราหู");
+    }).toList();
 
     return shuffleCards;
   }
