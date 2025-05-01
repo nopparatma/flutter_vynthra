@@ -3,16 +3,38 @@ default_platform(:android)
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
+    # อ่านเวอร์ชันปัจจุบันจาก pubspec.yaml
+    pubspec = File.read("#{Dir.pwd}/../pubspec.yaml")
+    version_match = pubspec.match(/version:\s+(\d+)\.(\d+)\.(\d+)\+(\d+)/)
+
+    if version_match
+      major = version_match[1]
+      minor = version_match[2]
+      patch = version_match[3]
+      version_number = "#{major}.#{minor}.#{patch}"
+      puts "Current version: #{version_number}"
+    else
+      UI.user_error!("Could not find version in pubspec.yaml")
+    end
+
     # สร้าง Flutter APK
     sh("cd .. && cd .. && flutter build apk --release")
-    
-    # ใช้ Firebase App Distribution
+
+    # เปลี่ยนชื่อไฟล์ APK ตาม pattern ที่ต้องการ
+    default_apk_path = "../build/app/outputs/flutter-apk/app-release.apk"
+    renamed_apk_path = "../build/app/outputs/flutter-apk/vynthra-#{version_number}.apk"
+
+    # เปลี่ยนชื่อไฟล์
+    sh("cp #{default_apk_path} #{renamed_apk_path}")
+    puts "Created APK with name: vynthra-#{version_number}.apk"
+
+    # ใช้ Firebase App Distribution กับไฟล์ APK ที่เปลี่ยนชื่อแล้ว
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
-      release_notes: "Build จาก GitHub Actions ผ่าน Fastlane",
+      release_notes: "Vynthra version #{version_number}",
       firebase_cli_token: ENV["FIREBASE_TOKEN"],
-      apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
+      apk_path: renamed_apk_path
     )
   end
 end
