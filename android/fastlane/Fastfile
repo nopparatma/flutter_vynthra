@@ -3,8 +3,13 @@ default_platform(:android)
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
+    # ใช้ ENV variable สำหรับ workspace directory
+    workspace_dir = ENV["GITHUB_WORKSPACE"] || ENV["WORKSPACE"] || "/home/runner/work/flutter_vynthra/flutter_vynthra"
+    pubspec_path = "#{workspace_dir}/pubspec.yaml"
+    puts "Reading version from: #{pubspec_path}"
+
     # อ่านเวอร์ชันปัจจุบันจาก pubspec.yaml
-    pubspec = File.read("#{Dir.pwd}/../../pubspec.yaml")
+    pubspec = File.read(pubspec_path)
     version_match = pubspec.match(/version:\s+(\d+)\.(\d+)\.(\d+)\+(\d+)/)
 
     if version_match
