@@ -3,6 +3,10 @@ default_platform(:android)
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
+    # ใช้เวอร์ชันจาก environment variable
+    version_number = ENV["FLUTTER_VERSION"]
+    puts "Using version: #{version_number}"
+
     # สร้าง Flutter APK
     sh("cd .. && cd .. && flutter build apk --release")
 
@@ -10,9 +14,10 @@ platform :android do
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
-      release_notes: "Build จาก GitHub Actions ผ่าน Fastlane",
+      release_notes: "Vynthra version #{version_number}",
       firebase_cli_token: ENV["FIREBASE_TOKEN"],
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
+      release_name: "#{version_number}"
     )
   end
 end
