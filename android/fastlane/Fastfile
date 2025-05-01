@@ -4,7 +4,7 @@ platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
     # อ่านเวอร์ชันปัจจุบันจาก pubspec.yaml
-    pubspec = File.read("#{Dir.pwd}/../pubspec.yaml")
+    pubspec = File.read("#{Dir.pwd}/../../pubspec.yaml")
     version_match = pubspec.match(/version:\s+(\d+)\.(\d+)\.(\d+)\+(\d+)/)
 
     if version_match
