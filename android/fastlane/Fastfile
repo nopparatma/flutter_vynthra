@@ -3,58 +3,16 @@ default_platform(:android)
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
-    # ใช้เวอร์ชันจาก environment variable
-    version_number = ENV["FLUTTER_VERSION"]
-    puts "Using version: #{version_number}"
-
-    unless version_number
-      UI.user_error!("FLUTTER_VERSION environment variable not set")
-    end
-
-    # หาเส้นทางของ root project
-    project_root = File.expand_path("../../..", Dir.pwd)
-    puts "Project root: #{project_root}"
-
     # สร้าง Flutter APK
-    sh("cd #{project_root} && flutter build apk --release")
+    sh("cd .. && cd .. && flutter build apk --release")
 
-    # เปลี่ยนชื่อไฟล์ APK ตาม pattern ที่ต้องการ
-    default_apk_path = "#{project_root}/build/app/outputs/flutter-apk/app-release.apk"
-    renamed_apk_path = "#{project_root}/build/app/outputs/flutter-apk/vynthra-#{version_number}.apk"
-
-    # ตรวจสอบว่าไฟล์มีอยู่จริงก่อนเปลี่ยนชื่อ
-    unless File.exist?(default_apk_path)
-      UI.error("APK file not found at: #{default_apk_path}")
-      UI.error("Searching for APK files in the build directory...")
-
-      # ค้นหาไฟล์ APK ในโฟลเดอร์ build
-      apk_files = Dir["#{project_root}/build/**/*.apk"]
-      if apk_files.empty?
-        UI.user_error!("No APK files found in the build directory")
-      else
-        UI.success("Found the following APK files:")
-        apk_files.each do |file|
-          UI.message("- #{file}")
-        end
-
-        # ใช้ไฟล์แรกที่พบ
-        default_apk_path = apk_files.first
-        renamed_apk_path = default_apk_path.sub(/\.apk$/, "-#{version_number}.apk")
-        UI.success("Using APK file: #{default_apk_path}")
-      end
-    end
-
-    # เปลี่ยนชื่อไฟล์
-    sh("cp #{default_apk_path} #{renamed_apk_path}")
-    puts "Created APK with name: #{File.basename(renamed_apk_path)}"
-
-    # ใช้ Firebase App Distribution กับไฟล์ APK ที่เปลี่ยนชื่อแล้ว
+    # ใช้ Firebase App Distribution
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
-      release_notes: "Vynthra version #{version_number}",
+      release_notes: "Build จาก GitHub Actions ผ่าน Fastlane",
       firebase_cli_token: ENV["FIREBASE_TOKEN"],
-      apk_path: renamed_apk_path
+      apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
     )
   end
 end
