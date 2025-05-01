@@ -3,23 +3,12 @@ default_platform(:android)
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
   lane :distribute_firebase do
-    # ใช้ ENV variable สำหรับ workspace directory
-    workspace_dir = ENV["GITHUB_WORKSPACE"] || ENV["WORKSPACE"] || "/home/runner/work/flutter_vynthra/flutter_vynthra"
-    pubspec_path = "#{workspace_dir}/pubspec.yaml"
-    puts "Reading version from: #{pubspec_path}"
+    # ใช้เวอร์ชันจาก environment variable
+    version_number = ENV["FLUTTER_VERSION"]
+    puts "Using version: #{version_number}"
 
-    # อ่านเวอร์ชันปัจจุบันจาก pubspec.yaml
-    pubspec = File.read(pubspec_path)
-    version_match = pubspec.match(/version:\s+(\d+)\.(\d+)\.(\d+)\+(\d+)/)
-
-    if version_match
-      major = version_match[1]
-      minor = version_match[2]
-      patch = version_match[3]
-      version_number = "#{major}.#{minor}.#{patch}"
-      puts "Current version: #{version_number}"
-    else
-      UI.user_error!("Could not find version in pubspec.yaml")
+    unless version_number
+      UI.user_error!("FLUTTER_VERSION environment variable not set")
     end
 
     # สร้าง Flutter APK
