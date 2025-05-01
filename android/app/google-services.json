@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "26861134855",
+    "project_id": "vynthra-ae607",
+    "storage_bucket": "vynthra-ae607.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26861134855:android:450f4f6e94f9cf68b676a2",
+        "android_client_info": {
+          "package_name": "com.soyacht.vynthra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgKtfuN2rP6r7J9dg2ffpuh499C_cq8Ow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
