@@ -16,11 +16,13 @@ class GeminiPredictionController extends GetxController {
   final CardModel? cardItem;
   final String? question;
   final PromptType? promptType;
+  final Map<int, CardModel>? cards;
 
   GeminiPredictionController({
     this.positionItem,
     this.cardItem,
     this.question,
+    this.cards,
     required this.promptType,
   });
 
@@ -45,6 +47,7 @@ class GeminiPredictionController extends GetxController {
         positionItem: positionItem,
         question: question,
         promptType: promptType,
+        cards: cards,
       ).getPrompt();
       debugPrint('Prompt: $prompt');
 

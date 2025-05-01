@@ -25,6 +25,7 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
   late PromptType? promptType;
   late String? question;
   late GeminiPredictionController geminiPredictionController;
+  late Map<int, CardModel>? cards;
 
   @override
   void initState() {
@@ -32,12 +33,14 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
     cardItem = ArgumentUtil.getArgument<CardModel>('cardItem');
     promptType = ArgumentUtil.getArgument<PromptType>('promptType');
     question = ArgumentUtil.getArgument<String>('question');
+    cards = ArgumentUtil.getArgument<Map<int, CardModel>>('cards');
 
     geminiPredictionController = Get.put(
       GeminiPredictionController(
         positionItem: positionItem,
         cardItem: cardItem,
         question: question,
+        cards: cards,
         promptType: promptType,
       ),
     );

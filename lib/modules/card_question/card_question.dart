@@ -3,6 +3,7 @@ import 'package:vynthra/app/app_controller.dart';
 import 'package:vynthra/app/app_theme.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:vynthra/models/card_model.dart';
+import 'package:vynthra/modules/gemini_prediction/constants.dart';
 import 'package:vynthra/widget/common_layout.dart';
 import 'package:vynthra/widget/rainbow_border_button.dart';
 import 'package:get/get.dart';
@@ -113,9 +114,13 @@ class _CardQuestionPageState extends State<CardQuestionPage> {
     final Map<String, dynamic> readingData = {
       'question': questionController.text,
       'cards': selectedCards,
+      'promptType': PromptType.question,
     };
 
-    debugPrint('$readingData');
+    Get.toNamed(
+      RoutePath.geminiPrediction,
+      arguments: readingData,
+    );
   }
 
   @override
@@ -180,9 +185,9 @@ class _CardQuestionPageState extends State<CardQuestionPage> {
                           label: Text(
                             'ล้างไพ่',
                             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.accentColor,
-                            ),
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.accentColor,
+                                ),
                           ),
                         ),
                       ),
