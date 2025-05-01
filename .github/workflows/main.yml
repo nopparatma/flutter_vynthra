@@ -41,6 +41,12 @@ jobs:
           echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > firebase_credentials.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/firebase_credentials.json" >> $GITHUB_ENV
 
+      - name: Extract Version Number
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d '+' -f 1)
+          echo "FLUTTER_VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Current version: ${VERSION}"
+
       - name: Distribute Android app with Fastlane
         run: |
           cd android
@@ -48,6 +54,7 @@ jobs:
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
 
       # ถ้าต้องการ build สำหรับ iOS เพิ่มขั้นตอนต่อไปนี้
       # - name: Install CocoaPods
