@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:vynthra/app/app_controller.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
-import 'package:vynthra/modules/gemini_prediction/models/prompt_ai.dart';
+import 'package:vynthra/models/prompt_model.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -11,6 +12,8 @@ class GeminiPredictionController extends GetxController {
   var isLoading = true.obs;
   var predictionHtml = ''.obs;
   var errorMessage = ''.obs;
+
+  final AppController appController = Get.find<AppController>();
 
   final PositionModel? positionItem;
   final CardModel? cardItem;
@@ -42,13 +45,16 @@ class GeminiPredictionController extends GetxController {
         apiKey: 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA',
       );
 
-      final String prompt = PromptAi(
-        cardItem: cardItem,
-        positionItem: positionItem,
-        question: question,
-        promptType: promptType,
-        cards: cards,
-      ).getPrompt();
+      // final String prompt = PromptAi(
+      //   cardItem: cardItem,
+      //   positionItem: positionItem,
+      //   question: question,
+      //   promptType: promptType,
+      //   cards: cards,
+      // ).getPrompt();
+
+      String prompt = getDynamicPrompt();
+
       debugPrint('Prompt: $prompt');
 
       final content = [Content.text(prompt)];
@@ -103,5 +109,55 @@ class GeminiPredictionController extends GetxController {
 
     // If nothing works, just return the original response
     return rawResponse;
+  }
+
+  String getDynamicPrompt() {
+    // Find the prompt model based on prompt type
+    PromptModel promptItem = appController.prompts.firstWhere(
+      (e) => e.promptType.toString().toUpperCase() == promptType?.toTypeString().toUpperCase(),
+    );
+
+    // Define a map for common replacements
+    final Map<String, String> replacements = {};
+    final promptTypeUpper = promptItem.promptType.toUpperCase();
+
+    // Add standard replacements based on prompt type
+    if (promptTypeUpper == PromptType.standard.toTypeString().toUpperCase()) {
+      replacements.addAll({
+        'CARD_NAME': cardItem?.name.th ?? '',
+        'POSITION_NAME': positionItem?.name.th ?? '',
+        'CARD_INFO': 'รายละเอียด = ${cardItem?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cardItem?.getPredictionText(lang: 'th')}',
+        'POSITION_INFO': 'รายละเอียด = ${positionItem?.getDescriptionText(lang: 'th')}',
+        'HTML_SAMPLE': promptItem.responseSample,
+      });
+    } else if (promptTypeUpper == PromptType.question.toTypeString().toUpperCase()) {
+      replacements.addAll({
+        'CARD_NAME_1': cards?[0]?.name.th ?? '',
+        'CARD_NAME_2': cards?[1]?.name.th ?? '',
+        'CARD_NAME_3': cards?[2]?.name.th ?? '',
+        'QUESTION': question ?? '',
+        'CARD_INFO_1': 'รายละเอียด = ${cards?[0]?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cards?[0]?.getPredictionText(lang: 'th')}',
+        'CARD_INFO_2': 'รายละเอียด = ${cards?[1]?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cards?[1]?.getPredictionText(lang: 'th')}',
+        'CARD_INFO_3': 'รายละเอียด = ${cards?[2]?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cards?[2]?.getPredictionText(lang: 'th')}',
+        'HTML_SAMPLE': promptItem.responseSample,
+      });
+    } else if (promptTypeUpper == PromptType.fortune.toTypeString().toUpperCase()) {
+      replacements.addAll({
+        'CARD_NAME': cardItem?.name.th ?? '',
+        'QUESTION': question ?? '',
+        'CARD_INFO': 'รายละเอียด = ${cardItem?.getDescriptionText(lang: 'th')}, การพยากรณ์และคำทำนายโดยละเอียด = ${cardItem?.getPredictionText(lang: 'th')}',
+        'HTML_SAMPLE': promptItem.responseSample,
+      });
+    } else {
+      return '';
+    }
+
+    // Apply all replacements to the prompt
+    String result = promptItem.prompt;
+    replacements.forEach((key, value) {
+      result = result.replaceAll(key, value);
+    });
+
+    return result;
   }
 }

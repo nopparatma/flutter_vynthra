@@ -217,6 +217,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                       icon: Icons.auto_awesome_outlined,
                       onPressed: _predictFortune,
                     ),
+                    SizedBox(height: 250),
                   ],
                 ),
               )

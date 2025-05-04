@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
+import 'package:vynthra/models/prompt_model.dart';
 import 'package:vynthra/services/mongo_connector.dart';
 import 'package:get/get.dart';
 
@@ -14,6 +15,7 @@ class AppController extends GetxController {
   final RxList<PositionModel> positions = <PositionModel>[].obs;
   final RxList<CardModel> cards = <CardModel>[].obs;
   final RxList<CardModel> filteredCards = <CardModel>[].obs;
+  final RxList<PromptModel> prompts = <PromptModel>[].obs;
 
   @override
   void onClose() {
@@ -38,6 +40,7 @@ class AppController extends GetxController {
 
       await loadPositions();
       await loadCards();
+      await loadPrompts();
 
       await Future.delayed(Duration(milliseconds: 3000));
 
@@ -55,6 +58,7 @@ class AppController extends GetxController {
     try {
       final List<Map<String, dynamic>> results = await _mongo.find('positions');
       positions.value = results.map((data) => PositionModel.fromMap(data)).toList();
+      debugPrint('loadPositions: SUCCESS');
     } catch (e) {
       debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
     }
@@ -65,6 +69,17 @@ class AppController extends GetxController {
       final List<Map<String, dynamic>> results = await _mongo.find('cards');
       cards.value = results.map((data) => CardModel.fromMap(data)).toList();
       resetFilteredCards();
+      debugPrint('loadCards: SUCCESS');
+    } catch (e) {
+      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
+    }
+  }
+
+  Future<void> loadPrompts() async {
+    try {
+      final List<Map<String, dynamic>> results = await _mongo.find('prompts');
+      prompts.value = results.map((data) => PromptModel.fromMap(data)).toList();
+      debugPrint('loadPrompts: SUCCESS');
     } catch (e) {
       debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
     }

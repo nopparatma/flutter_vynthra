@@ -200,7 +200,8 @@ class _CardQuestionPageState extends State<CardQuestionPage> {
                     ),
                   ],
                 ),
-              )
+              ),
+              SizedBox(height: 250),
             ],
           );
         }),

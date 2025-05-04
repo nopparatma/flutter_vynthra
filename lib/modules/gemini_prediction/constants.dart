@@ -1,5 +1,11 @@
 enum PromptType { standard, question, fortune }
 
+extension PromptTypeExtension on PromptType {
+  String toTypeString() {
+    return toString().split('.').last;
+  }
+}
+
 const String standardHtmlDataFromAIExample = '''
 <html>
   <head>
