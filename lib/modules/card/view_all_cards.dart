@@ -123,11 +123,31 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
       child: Image.network(
         cardItem.imageUrl,
         errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: AppTheme.primaryColor,
-            child: const Center(
-              child: Icon(Icons.image_not_supported, size: 50),
-            ),
+          return Stack(
+            children: [
+              Container(
+                color: AppTheme.primaryColor,
+                child: const Center(
+                  child: Icon(Icons.image_not_supported, size: 50),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      cardItem.name.th,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
         loadingBuilder: (context, child, loadingProgress) {
