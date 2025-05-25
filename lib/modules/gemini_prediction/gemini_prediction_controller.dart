@@ -5,6 +5,7 @@ import 'package:vynthra/models/position_model.dart';
 import 'package:vynthra/models/prompt_model.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:vynthra/utils/shared_pref_util.dart';
 
 import 'constants.dart';
 
@@ -35,42 +36,21 @@ class GeminiPredictionController extends GetxController {
     super.onInit();
   }
 
-  Future<void> fetchPredictionData() async {
+  Future<void> fetchPredictionData({bool isRefresh = false}) async {
     isLoading.value = true;
     errorMessage.value = '';
 
     try {
-      final model = GenerativeModel(
-        model: 'gemini-2.0-flash-lite',
-        apiKey: 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA',
-      );
+      final String cacheKey = '${cardItem?.id}_${positionItem?.id}';
 
-      // final String prompt = PromptAi(
-      //   cardItem: cardItem,
-      //   positionItem: positionItem,
-      //   question: question,
-      //   promptType: promptType,
-      //   cards: cards,
-      // ).getPrompt();
-
-      String prompt = getDynamicPrompt();
-
-      debugPrint('Prompt: $prompt');
-
-      final content = [Content.text(prompt)];
-      final response = await model.generateContent(content);
-
-      if (response.text != null) {
-        String extractedHtml = extractHtmlContent(response.text!);
-
-        if (extractedHtml.isNotEmpty) {
-          predictionHtml.value = extractedHtml;
-        } else {
-          errorMessage.value = 'ไม่พบข้อมูล HTML ที่ถูกต้องจาก AI';
-        }
-      } else {
-        errorMessage.value = 'ไม่มีข้อมูลคำทำนายจาก AI';
+      if (!isRefresh && PromptType.standard == promptType && await SharedPrefUtil.containsKey(cacheKey)) {
+        predictionHtml.value = await SharedPrefUtil.read(cacheKey);
+        return;
       }
+
+      String result = await _generateByAI();
+      predictionHtml.value = result;
+      await SharedPrefUtil.save(cacheKey, result);
     } catch (e) {
       debugPrint('Exception: $e');
       errorMessage.value = 'Exception: $e';
@@ -159,5 +139,35 @@ class GeminiPredictionController extends GetxController {
     });
 
     return result;
+  }
+
+  Future<String> _generateByAI() async {
+    final String prompt = getDynamicPrompt();
+    debugPrint('Prompt: $prompt');
+
+    final response = await _generateAIContent(prompt);
+    final String extractedHtml = extractHtmlContent(response);
+
+    if (extractedHtml.isEmpty) {
+      throw 'ไม่พบข้อมูล HTML ที่ถูกต้องจาก AI';
+    }
+
+    return extractedHtml;
+  }
+
+  Future<String> _generateAIContent(String prompt) async {
+    final model = GenerativeModel(
+      model: 'gemini-2.0-flash-lite',
+      apiKey: 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA',
+    );
+
+    final content = [Content.text(prompt)];
+    final response = await model.generateContent(content);
+
+    if (response.text == null) {
+      throw Exception('ไม่มีข้อมูลคำทำนายจาก AI');
+    }
+
+    return response.text!;
   }
 }

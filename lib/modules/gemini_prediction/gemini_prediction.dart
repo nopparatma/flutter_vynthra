@@ -56,7 +56,7 @@ class _GeminiPredictionPageState extends State<GeminiPredictionPage> {
   }
 
   void onPressRefresh() {
-    geminiPredictionController.fetchPredictionData();
+    geminiPredictionController.fetchPredictionData(isRefresh: true);
   }
 
   @override
