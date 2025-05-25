@@ -5,6 +5,7 @@ import 'package:vynthra/app/router.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/modules/gemini_prediction/constants.dart';
 import 'package:vynthra/widget/common_layout.dart';
+import 'package:vynthra/widget/custom_loading.dart';
 import 'package:vynthra/widget/rainbow_border_button.dart';
 import 'package:get/get.dart';
 
@@ -123,6 +124,16 @@ class _CardQuestionPageState extends State<CardQuestionPage> {
     );
   }
 
+  void randomCard() {
+    setState(() {
+      var cardShuffles = (List.from(appController.cards)..shuffle()).take(cardPositions.length).toList();
+
+      for (int i = 0; i < cardShuffles.length; i++) {
+        selectedCards[i] = cardShuffles[i];
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -156,9 +167,25 @@ class _CardQuestionPageState extends State<CardQuestionPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'เลือกไพ่ 3 ใบ',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'เลือกไพ่ 3 ใบ',
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            TextButton.icon(
+                              onPressed: randomCard,
+                              icon: const Icon(Icons.casino_outlined),
+                              label: Text(
+                                'สุ่มไพ่',
+                                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.accentColor,
+                                    ),
+                              ),
+                            )
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -303,28 +330,43 @@ class SelectedCardSlot extends StatelessWidget {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (selectedCard!.imageUrl.isNotEmpty)
-                        Expanded(
-                          child: Image.network(
-                            selectedCard!.imageUrl,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(
-                                Icons.auto_awesome,
-                                size: 40,
-                                color: Colors.amber,
-                              );
-                            },
-                          ),
-                        )
-                      else
-                        const Expanded(
-                          child: Icon(
-                            Icons.auto_awesome,
-                            size: 40,
-                            color: Colors.amber,
-                          ),
+                      Expanded(
+                        child: Image.network(
+                          selectedCard?.imageUrl ?? '',
+                          errorBuilder: (context, error, stackTrace) {
+                            return Stack(
+                              children: [
+                                Container(
+                                  color: AppTheme.primaryColor,
+                                  child: const Center(
+                                    child: Icon(Icons.image_not_supported, size: 50),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        selectedCard?.name.th ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return CustomLoadingWidget();
+                          },
                         ),
+                      )
                     ],
                   )
                 : const Center(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/app_theme.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
@@ -67,12 +68,35 @@ class _CardStandardPageState extends State<CardStandardPage> {
     });
   }
 
+  void randomCard() {
+    setState(() {
+      var cardShuffles = (List.from(appController.cards)..shuffle()).take(appController.positions.length).toList();
+
+      for (int i = 0; i < cardShuffles.length; i++) {
+        PositionModel itemPosition = appController.positions[i];
+        CardModel itemCard = cardShuffles[i];
+        selectedCards[itemPosition.id] = itemCard;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonLayout(
       title: 'ไพ่ 12 ตำแหน่ง',
       scrollController: scrollController,
       isShowBackAppBar: true,
+      action: TextButton.icon(
+        onPressed: randomCard,
+        icon: const Icon(Icons.casino_outlined),
+        label: Text(
+          'สุ่มไพ่',
+          style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppTheme.accentColor,
+              ),
+        ),
+      ),
       body: Obx(
         () => GridView.builder(
           controller: scrollController,
