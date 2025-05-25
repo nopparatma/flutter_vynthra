@@ -50,7 +50,10 @@ class GeminiPredictionController extends GetxController {
 
       String result = await _generateByAI();
       predictionHtml.value = result;
-      await SharedPrefUtil.save(cacheKey, result);
+
+      if (PromptType.standard == promptType) {
+        await SharedPrefUtil.save(cacheKey, result);
+      }
     } catch (e) {
       debugPrint('Exception: $e');
       errorMessage.value = 'Exception: $e';
