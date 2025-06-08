@@ -156,18 +156,21 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
                             fontWeight: FontWeight.bold,
                           ),
                     )),
-                collapsed: Text(
-                  item.content.th,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  softWrap: true,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                collapsed: SelectionArea(
+                  child: Text(
+                    item.content.th,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    softWrap: true,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                expanded: Text(
-                  item.content.th,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  softWrap: true,
-                  overflow: TextOverflow.fade,
+                expanded: SelectionArea(
+                  child: Text(
+                    item.content.th,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    softWrap: true,
+                  ),
                 ),
                 builder: (_, collapsed, expanded) {
                   return Padding(
