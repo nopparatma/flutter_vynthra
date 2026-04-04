@@ -160,8 +160,8 @@ class GeminiPredictionController extends GetxController {
 
   Future<String> _generateAIContent(String prompt) async {
     final model = GenerativeModel(
-      model: 'gemini-2.0-flash-lite',
-      apiKey: 'AIzaSyDz5PEkkiO6MM_j1o5QMd2K5JP8Qn5swRA',
+      model: 'gemini-2.5-pro',
+      apiKey: 'AIzaSyCUx_wf0y9Fqdxo61ZFbJtXDtBx-xsxO-s',
     );
 
     final content = [Content.text(prompt)];
