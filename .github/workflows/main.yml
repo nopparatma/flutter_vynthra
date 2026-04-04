@@ -8,6 +8,8 @@ on:
 jobs:
   distribute:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,12 +31,10 @@ jobs:
         with:
           ruby-version: '3.2'
           bundler-cache: true
+          working-directory: android
 
       - name: Install dependencies
-        run: |
-          flutter pub get
-          cd android
-          bundle install
+        run: flutter pub get
 
       - name: Create Firebase Service Credentials file
         run: |
