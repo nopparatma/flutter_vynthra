@@ -53,7 +53,6 @@ jobs:
           bundle exec fastlane distribute_firebase
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
 
       # ถ้าต้องการ build สำหรับ iOS เพิ่มขั้นตอนต่อไปนี้

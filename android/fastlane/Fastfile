@@ -15,7 +15,7 @@ platform :android do
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
       release_notes: "Vynthra version #{version_number}",
-      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      service_credentials_file: ENV["GOOGLE_APPLICATION_CREDENTIALS"],
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
     )
   end
