@@ -1,5 +1,3 @@
-import 'package:mongo_dart/mongo_dart.dart';
-
 import 'base_i18n_text.dart';
 
 class PositionModel {
@@ -18,7 +16,7 @@ class PositionModel {
   });
 
   factory PositionModel.fromMap(Map<String, dynamic> map) {
-    final id = map['_id'] is ObjectId ? (map['_id'] as ObjectId).oid : map['_id']?.toString() ?? '';
+    final id = map['_id']?.toString() ?? '';
 
     List<PositionDescription> descriptionList = [];
     if (map['description'] != null && map['description'] is List) {
@@ -35,7 +33,7 @@ class PositionModel {
   }
 
   Map<String, dynamic> toMap() {
-    final map = {
+    final Map<String, dynamic> map = {
       'seq': seq,
       'name': name.toMap(),
       'imageUrl': imageUrl,
@@ -43,7 +41,7 @@ class PositionModel {
     };
 
     if (id.isNotEmpty) {
-      map['_id'] = ObjectId.parse(id);
+      map['_id'] = id;
     }
 
     return map;

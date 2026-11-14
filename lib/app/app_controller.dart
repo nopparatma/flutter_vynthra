@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:vynthra/app/env.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
-import 'package:vynthra/models/prompt_model.dart';
-import 'package:vynthra/services/mongo_connector.dart';
+import 'package:vynthra/services/api_client.dart';
 import 'package:get/get.dart';
 
 class AppController extends GetxController {
-  final MongoConnector _mongo = MongoConnector();
+  final ApiClient api;
+
+  AppController({ApiClient? api}) : api = api ?? ApiClient();
 
   final RxBool isConnected = false.obs;
   final RxBool isLoading = false.obs;
@@ -16,11 +16,10 @@ class AppController extends GetxController {
   final RxList<PositionModel> positions = <PositionModel>[].obs;
   final RxList<CardModel> cards = <CardModel>[].obs;
   final RxList<CardModel> filteredCards = <CardModel>[].obs;
-  final RxList<PromptModel> prompts = <PromptModel>[].obs;
 
   @override
   void onClose() {
-    _mongo.disconnect();
+    api.close();
     super.onClose();
   }
 
@@ -29,24 +28,14 @@ class AppController extends GetxController {
     errorMessage.value = '';
 
     try {
-      _mongo.configure(
-        host: "cluster0.ridkr.mongodb.net",
-        dbName: Env.dbName,
-        username: "username",
-        password: "692345",
-      );
-
-      await _mongo.connect();
+      await Future.wait([loadPositions(), loadCards()]);
       isConnected.value = true;
-
-      await loadPositions();
-      await loadCards();
-      await loadPrompts();
 
       await Future.delayed(Duration(milliseconds: 3000));
 
       return true;
     } catch (e) {
+      isConnected.value = false;
       errorMessage.value = 'เกิดข้อผิดพลาดในการเชื่อมต่อ: $e';
       debugPrint(errorMessage.value);
       return false;
@@ -56,34 +45,16 @@ class AppController extends GetxController {
   }
 
   Future<void> loadPositions() async {
-    try {
-      final List<Map<String, dynamic>> results = await _mongo.find('positions');
-      positions.value = results.map((data) => PositionModel.fromMap(data)).toList();
-      debugPrint('loadPositions: SUCCESS');
-    } catch (e) {
-      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
-    }
+    final results = await api.getList('/v1/positions');
+    positions.value = results.map((data) => PositionModel.fromMap(data)).toList();
+    debugPrint('loadPositions: SUCCESS');
   }
 
   Future<void> loadCards() async {
-    try {
-      final List<Map<String, dynamic>> results = await _mongo.find('cards');
-      cards.value = results.map((data) => CardModel.fromMap(data)).toList();
-      resetFilteredCards();
-      debugPrint('loadCards: SUCCESS');
-    } catch (e) {
-      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
-    }
-  }
-
-  Future<void> loadPrompts() async {
-    try {
-      final List<Map<String, dynamic>> results = await _mongo.find('prompts');
-      prompts.value = results.map((data) => PromptModel.fromMap(data)).toList();
-      debugPrint('loadPrompts: SUCCESS');
-    } catch (e) {
-      debugPrint('เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้: $e');
-    }
+    final results = await api.getList('/v1/cards');
+    cards.value = results.map((data) => CardModel.fromMap(data)).toList();
+    resetFilteredCards();
+    debugPrint('loadCards: SUCCESS');
   }
 
   void resetFilteredCards() {

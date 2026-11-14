@@ -1,4 +1,4 @@
 {
   "ENV_NAME": "dev",
-  "DB_NAME": "vynthra_dev"
+  "API_BASE_URL": "https://vynthra-service-dev.vercel.app"
 }
