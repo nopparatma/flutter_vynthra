@@ -1,4 +1,4 @@
-name: Build and distribute with Fastlane
+name: Build and distribute
 
 on:
   push:
@@ -6,8 +6,15 @@ on:
       - main      # build ด้วย config/prod.json
       - 'rc/**'   # build ด้วย config/dev.json
 
+# android กับ web รันขนานกัน ไม่รอกัน ตัวไหนเสร็จก่อนก็ปล่อยก่อน
+env:
+  FLUTTER_VERSION_PIN: '3.50.0'
+  APP_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+  BUILD_NUMBER: ${{ github.run_number }}  # เพิ่มขึ้นทุกครั้งที่ workflow รัน
+
 jobs:
-  distribute:
+  android:
+    name: Android (Firebase App Distribution)
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -20,12 +27,14 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
-          flutter-version: '3.50.0'
+          flutter-version: ${{ env.FLUTTER_VERSION_PIN }}
           channel: 'stable'
+          cache: true
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -48,14 +57,6 @@ jobs:
           echo "FLUTTER_VERSION=${VERSION}" >> $GITHUB_ENV
           echo "Current version: ${VERSION}"
 
-      - name: Select environment
-        run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "APP_ENV=prod" >> $GITHUB_ENV
-          else
-            echo "APP_ENV=dev" >> $GITHUB_ENV
-          fi
-
       - name: Distribute Android app with Fastlane
         run: |
           cd android
@@ -63,19 +64,46 @@ jobs:
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
-          APP_ENV: ${{ env.APP_ENV }}
-          BUILD_NUMBER: ${{ github.run_number }}  # เพิ่มขึ้นทุกครั้งที่ workflow รัน
 
-      # ถ้าต้องการ build สำหรับ iOS เพิ่มขั้นตอนต่อไปนี้
-      # - name: Install CocoaPods
-      #   run: |
-      #     cd ios
-      #     pod install
+  web:
+    name: Web (Vercel)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: web-${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+      cancel-in-progress: false
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ github.ref_name == 'main' && vars.VERCEL_PROJECT_ID_PROD || vars.VERCEL_PROJECT_ID_DEV }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # - name: Distribute iOS app with Fastlane
-      #   run: |
-      #     cd ios
-      #     bundle exec fastlane distribute_firebase
-      #   env:
-      #     FIREBASE_APP_ID_IOS: ${{ secrets.FIREBASE_APP_ID_IOS }}
-      #     FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Check deploy credentials
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret is not set (Settings > Secrets and variables > Actions)"
+            exit 1
+          fi
+          echo "Deploying web to ${{ github.ref_name == 'main' && 'vynthra-web (prod)' || 'vynthra-web-dev' }}"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION_PIN }}
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build web
+        run: flutter build web --release --dart-define-from-file=config/${APP_ENV}.json --build-number=${BUILD_NUMBER}
+
+      # แต่ละ project ให้บริการจาก production deployment ของตัวเอง
+      # จึง deploy ด้วย --prod ทั้งคู่ ตัวเลือก dev/prod อยู่ที่ project id
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@65.16.0 deploy build/web --prod --yes --token="$VERCEL_TOKEN"

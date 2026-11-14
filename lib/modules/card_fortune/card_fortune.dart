@@ -236,6 +236,8 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
           Expanded(
             child: Image.network(
               selectedCard!.imageUrl,
+              // S3 serves the card images without CORS headers; on web fall back to an <img> element.
+              webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return _buildCardFallback();

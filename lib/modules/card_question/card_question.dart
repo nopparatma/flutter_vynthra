@@ -333,6 +333,8 @@ class SelectedCardSlot extends StatelessWidget {
                       Expanded(
                         child: Image.network(
                           selectedCard?.imageUrl ?? '',
+                          // S3 serves the card images without CORS headers; on web fall back to an <img> element.
+                          webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
                           errorBuilder: (context, error, stackTrace) {
                             return Stack(
                               children: [

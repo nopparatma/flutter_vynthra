@@ -18,14 +18,14 @@
 ค่าต่อ environment อยู่ใน `config/<env>.json` อ่านผ่าน `lib/app/env.dart`
 ด้วย `--dart-define-from-file`
 
-| Environment | ไฟล์ | API |
-|---|---|---|
-| local (ไม่ใส่ flag) | - | `http://localhost:8787` |
-| dev | `config/dev.json` | https://vynthra-service-dev.vercel.app |
-| prod | `config/prod.json` | https://vynthra-service.vercel.app |
+| Environment | ไฟล์ | API | Web |
+|---|---|---|---|
+| local (ไม่ใส่ flag) | - | `http://localhost:8787` | - |
+| dev | `config/dev.json` | https://vynthra-service-dev.vercel.app | https://vynthra-web-dev.vercel.app |
+| prod | `config/prod.json` | https://vynthra-service.vercel.app | https://vynthra-web.vercel.app |
 
-เพิ่ม environment ใหม่ (เช่น staging) = เพิ่มไฟล์ใน `config/` แล้วเพิ่มเงื่อนไขใน
-step "Select environment" ของ `.github/workflows/main.yml`
+เพิ่ม environment ใหม่ (เช่น staging) = เพิ่มไฟล์ใน `config/` แล้วแก้ค่า `APP_ENV`
+และ project id ของ web ใน `.github/workflows/main.yml`
 
 ## เวอร์ชัน
 
@@ -50,9 +50,17 @@ step "Select environment" ของ `.github/workflows/main.yml`
 
 ## CI (`.github/workflows/main.yml`)
 
-- ทำงานเมื่อ push เข้า `main` หรือ `rc/**` เท่านั้น build เฉพาะ Android
-- ทุก push เข้า `rc/**` ส่ง build ให้ tester ทันที อย่า push งานที่ยังไม่พร้อมให้ทดสอบ
-- lane อยู่ที่ `android/fastlane/Fastfile` รับ `APP_ENV` และ `BUILD_NUMBER`
+- ทำงานเมื่อ push เข้า `main` หรือ `rc/**` เท่านั้น
+- มี 2 job รันขนานกัน ไม่รอกัน:
+  - `android`: build APK ส่ง Firebase App Distribution (ราว 4-5 นาที)
+    lane อยู่ที่ `android/fastlane/Fastfile` รับ `APP_ENV` และ `BUILD_NUMBER`
+  - `web`: `flutter build web` แล้ว deploy โฟลเดอร์ `build/web` ขึ้น Vercel
+    (`vynthra-web-dev` สำหรับ `rc/**`, `vynthra-web` สำหรับ `main`)
+- ทุก push เข้า `rc/**` ส่ง build ให้ tester และอัปเดต web dev ทันที
+  อย่า push งานที่ยังไม่พร้อมให้ทดสอบ
+- web ใช้ secret `VERCEL_TOKEN` และ variables `VERCEL_ORG_ID`,
+  `VERCEL_PROJECT_ID_DEV`, `VERCEL_PROJECT_ID_PROD` project web บน Vercel ไม่ได้ผูก
+  กับ Git จึง deploy ได้ทาง workflow เท่านั้น
 - ดูผล: `gh run list --branch <branch>` และ `gh run view <id> --log-failed`
 
 ## ข้อควรระวัง
@@ -60,7 +68,8 @@ step "Select environment" ของ `.github/workflows/main.yml`
 - **ห้ามใส่ credential ในโค้ด** repo นี้เป็น public และเคยมี credential หลุดใน git
   history มาแล้ว secret ทั้งหมดต้องอยู่ที่ backend
 - **Web**: ใช้ได้เพราะแอปเรียก HTTP อย่างเดียว ห้ามเพิ่ม package ที่ใช้ `dart:io`
-  socket รูปไพ่มาจาก S3 bucket `vynthra` ซึ่งยังไม่ได้เปิด CORS รูปจึงไม่ขึ้นบน web
+  socket รูปไพ่มาจาก S3 bucket `vynthra` ซึ่งไม่ได้เปิด CORS ทุก `Image.network`
+  จึงต้องใส่ `webHtmlElementStrategy: WebHtmlElementStrategy.fallback` ไม่งั้นรูปไม่ขึ้นบน web
 - **การทำนายใช้เวลาราว 35 วินาที** timeout ฝั่งแอปตั้งไว้ 150 วินาทีใน
   `lib/services/api_client.dart`
 - Flutter/IDE มักแก้ไฟล์ใน `ios/`, `analysis_options.yaml`, `flutter_vynthra.iml`

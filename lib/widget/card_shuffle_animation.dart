@@ -189,6 +189,8 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
         borderRadius: BorderRadius.circular(width * 0.06),
         child: Image.network(
           card.imageUrl,
+          // S3 serves the card images without CORS headers; on web fall back to an <img> element.
+          webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             return _buildCardWithName(card, width, height);

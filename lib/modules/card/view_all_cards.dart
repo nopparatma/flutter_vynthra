@@ -122,6 +122,8 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
       onTap: () => onTapCard(cardItem),
       child: Image.network(
         cardItem.imageUrl,
+        // S3 serves the card images without CORS headers; on web fall back to an <img> element.
+        webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
         errorBuilder: (context, error, stackTrace) {
           return Stack(
             children: [

@@ -49,6 +49,8 @@ class _CardDetailPageState extends State<CardDetailPage> with SingleTickerProvid
                       padding: const EdgeInsets.all(8.0),
                       child: Image.network(
                         cardItem?.imageUrl ?? "",
+                        // S3 serves the card images without CORS headers; on web fall back to an <img> element.
+                        webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
                         fit: BoxFit.fitHeight,
                         height: 300,
                         errorBuilder: (context, error, stackTrace) {
