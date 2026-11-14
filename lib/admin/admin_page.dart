@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:vynthra/app/env.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 class DeityCardModel {
@@ -55,7 +56,7 @@ class _DeityCardAdminPageState extends State<DeityCardAdminPage> {
 
   // MongoDB connection
   mongo.Db? _db;
-  final String _mongoConnectionString = 'mongodb+srv://username:692345@cluster0.ridkr.mongodb.net/vynthra';
+  final String _mongoConnectionString = 'mongodb+srv://username:692345@cluster0.ridkr.mongodb.net/${Env.dbName}';
 
   // Image selection
   File? _selectedImage;

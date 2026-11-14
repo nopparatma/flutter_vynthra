@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:vynthra/app/env.dart';
 import 'package:vynthra/models/card_model.dart';
 import 'package:vynthra/models/position_model.dart';
 import 'package:vynthra/models/prompt_model.dart';
@@ -30,7 +31,7 @@ class AppController extends GetxController {
     try {
       _mongo.configure(
         host: "cluster0.ridkr.mongodb.net",
-        dbName: "vynthra",
+        dbName: Env.dbName,
         username: "username",
         password: "692345",
       );

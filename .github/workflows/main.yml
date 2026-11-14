@@ -3,7 +3,8 @@ name: Build and distribute with Fastlane
 on:
   push:
     branches:
-      - main  # หรือ branch อื่นที่คุณต้องการ
+      - main      # build ด้วย config/prod.json
+      - 'rc/**'   # build ด้วย config/dev.json
 
 jobs:
   distribute:
@@ -47,6 +48,14 @@ jobs:
           echo "FLUTTER_VERSION=${VERSION}" >> $GITHUB_ENV
           echo "Current version: ${VERSION}"
 
+      - name: Select environment
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "APP_ENV=prod" >> $GITHUB_ENV
+          else
+            echo "APP_ENV=dev" >> $GITHUB_ENV
+          fi
+
       - name: Distribute Android app with Fastlane
         run: |
           cd android
@@ -54,6 +63,7 @@ jobs:
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
+          APP_ENV: ${{ env.APP_ENV }}
 
       # ถ้าต้องการ build สำหรับ iOS เพิ่มขั้นตอนต่อไปนี้
       # - name: Install CocoaPods

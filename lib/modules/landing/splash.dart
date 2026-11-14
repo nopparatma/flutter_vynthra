@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vynthra/app/app_controller.dart';
+import 'package:vynthra/app/env.dart';
 import 'package:vynthra/app/router.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -40,7 +41,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   Future<void> _getAppVersion() async {
     final packageInfo = await PackageInfo.fromPlatform();
     setState(() {
-      _version = 'Version ${packageInfo.version}';
+      _version = Env.isProd ? 'Version ${packageInfo.version}' : 'Version ${packageInfo.version} (${Env.name})';
     });
   }
 

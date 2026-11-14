@@ -2,19 +2,23 @@ default_platform(:android)
 
 platform :android do
   desc "Build and distribute to Firebase App Distribution"
-  lane :distribute_firebase do
+  # เลือก environment ด้วย APP_ENV (dev | prod — ตรงกับชื่อไฟล์ใน config/) หรือ `fastlane distribute_firebase env:prod`
+  lane :distribute_firebase do |options|
     # ใช้เวอร์ชันจาก environment variable
     version_number = ENV["FLUTTER_VERSION"]
-    puts "Using version: #{version_number}"
+    app_env = options[:env] || ENV["APP_ENV"] || "dev"
+    config_file = "config/#{app_env}.json"
+    UI.user_error!("Unknown environment: #{app_env}") unless File.exist?(File.expand_path("../../#{config_file}", __dir__))
+    puts "Using version: #{version_number} (#{app_env})"
 
     # สร้าง Flutter APK
-    sh("cd .. && cd .. && flutter build apk --release")
+    sh("cd .. && cd .. && flutter build apk --release --dart-define-from-file=#{config_file}")
 
     # ใช้ Firebase App Distribution
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
-      release_notes: "Vynthra version #{version_number}",
+      release_notes: "Vynthra version #{version_number} (#{app_env})",
       service_credentials_file: ENV["GOOGLE_APPLICATION_CREDENTIALS"],
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
     )
