@@ -15,8 +15,11 @@ platform :android do
     build_label = build_number.empty? ? version_number : "#{version_number}+#{build_number}"
     puts "Using version: #{build_label} (#{app_env})"
 
+    # เลขเวอร์ชันจาก CI (FLUTTER_VERSION) ถ้าไม่ได้ส่งมาจะใช้ค่าจาก pubspec.yaml
+    build_name_flag = version_number.to_s.strip.empty? ? "" : " --build-name=#{version_number.strip}"
+
     # สร้าง Flutter APK
-    sh("cd .. && cd .. && flutter build apk --release --dart-define-from-file=#{config_file}#{build_number_flag}")
+    sh("cd .. && cd .. && flutter build apk --release --dart-define-from-file=#{config_file}#{build_name_flag}#{build_number_flag}")
 
     # ใช้ Firebase App Distribution
     firebase_app_distribution(

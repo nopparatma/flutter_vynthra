@@ -29,26 +29,36 @@
 
 ## เวอร์ชัน
 
-- รูปแบบ `major.minor.patch` ใน `pubspec.yaml` แก้ด้วยมือ ไม่ใส่ `+build`
-  - minor ขยับเมื่อเริ่มรอบ release ใหม่ (แตก `rc/x.y.0`)
-  - patch ขยับเฉพาะ hotfix ของเวอร์ชันที่ปล่อย prod ไปแล้ว
-  - แก้ bug ระหว่างทดสอบ RC ไม่ต้องขยับเลขเวอร์ชัน
-- ก่อน merge เข้า `main` ทุกครั้ง เลขใน `pubspec.yaml` ต้องยังไม่เคยปล่อย
-  ถ้า tag `v<เลขนั้น>` มีอยู่แล้วที่ commit อื่น CI บน `main` จะ fail ที่ job "Check release version"
-- build number มาจาก CI (`github.run_number`) อย่าใส่เอง
+รูปแบบ `major.minor.patch (build)` เช่น `1.1.3 (43)` เลข patch และ build number
+มาจาก CI ไม่ต้องแก้มือ ตรรกะอยู่ที่ `.github/scripts/resolve-version.mjs`
+
+- `pubspec.yaml` เก็บแค่ฐาน `major.minor.0` (เช่น `1.1.0`) CI ใช้แค่ `major.minor`
+  build ในเครื่องจึงเห็นเลขฐาน ไม่ใช่เลขจริง
+- **push เข้า `rc/**`**: patch +1 จาก tag ล่าสุดของสายนั้น (`v1.1.2` → `1.1.3`)
+  และ build number = เลขรอบรันของ workflow เมื่อ android และ web ผ่าน
+  CI ติด tag `v1.1.3` (ข้อความ tag จด build number) ที่ commit นั้น
+- **push เข้า `main`**: ไม่บวกทั้ง patch และ build number CI อ่าน tag ของ commit
+  ที่ merge เข้ามาแล้วใช้เลขนั้น prod จึงได้เลขเดียวกับตัวที่ tester ทดสอบ
+  ถ้า commit นั้นไม่มี tag CI จะ fail ที่ job "Resolve version"
+- ขึ้น minor/major ใหม่: แก้ฐานใน `pubspec.yaml` (เช่น `1.2.0`) patch เริ่มที่ 0 ใหม่
+  ส่วน build number นับต่อ ไม่ reset (store บังคับให้เพิ่มขึ้นเสมอ) เช่น `1.1.42 (42)` → `1.2.0 (43)`
+- อย่าติด tag `v*` ด้วยมือ และอย่าลบ tag เพราะ CI ใช้นับเลขถัดไป
+- build dev กับ prod ของ commit เดียวกันมีเลขเดียวกัน แยกด้วย `(dev)` / `(prod)`
+  ใน release notes และบนหน้า splash
 
 ## ขั้นตอน release
 
-1. แตก `rc/x.y.0` จาก `main` แล้วแก้ `version` ใน `pubspec.yaml`
+1. ทำงานบน `rc/x.y.0` (ขึ้นรอบใหม่: แตกจาก `main` แล้วแก้ฐานเวอร์ชันใน `pubspec.yaml`)
 2. push เข้า `rc/**` → CI build ด้วย `config/dev.json` ส่ง Firebase App Distribution
-   ให้กลุ่ม `internal-testers`
-3. แก้ bug บน branch `rc/x.y.0` จนผ่าน
-4. merge เข้า `main` → CI build ด้วย `config/prod.json`
-5. CI ติด tag `vx.y.z` ที่ `main` ให้เองเมื่อ android และ web ผ่าน (ไม่ต้องติดมือ)
-6. hotfix: แตก `hotfix/x.y.z` จาก `main` ขยับ patch แล้ว merge กลับ `main`
+   ให้กลุ่ม `internal-testers` และอัปเดต web dev
+3. แก้ bug บน branch เดิมจนผ่าน ทุก push ได้เลขใหม่
+4. **รอให้ CI ของ commit ล่าสุดบน rc ผ่านและติด tag ก่อน** แล้ว merge commit นั้นเข้า `main`
+   (fast-forward หรือ merge commit ก็ได้) → CI build ด้วย `config/prod.json` ด้วยเลขเดิม
+5. hotfix ทำแบบเดียวกัน: แก้บน `rc/x.y.0` → push → ทดสอบ → merge เข้า `main`
 
 ถ้า release รอบนั้นแก้ backend ด้วย ให้ใช้ชื่อ branch `rc/x.y.0` เดียวกันใน
 `vynthra_service` และ merge เข้า `main` ของ backend ก่อนหรือพร้อมกับแอป
+เลข patch ของแอปกับ backend นับแยกกัน ตรงกันแค่ `major.minor`
 
 ## CI (`.github/workflows/main.yml`)
 

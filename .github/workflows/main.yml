@@ -10,41 +10,37 @@ on:
 env:
   FLUTTER_VERSION_PIN: '3.50.0'
   APP_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
-  BUILD_NUMBER: ${{ github.run_number }}  # เพิ่มขึ้นทุกครั้งที่ workflow รัน
+
+# รันทีละรอบต่อ branch เพื่อไม่ให้สองรอบได้เลขเวอร์ชันเดียวกัน
+concurrency:
+  group: ci-${{ github.ref_name }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  # บน main: กันการปล่อย prod ด้วยเลขเวอร์ชันซ้ำกับรอบก่อน (tag v<version> มีอยู่แล้วที่ commit อื่น)
+  # เลขเวอร์ชันมาจาก git tag (ดู .github/scripts/resolve-version.mjs)
+  #   rc/**: patch และ build number +1 ทุกรอบ
+  #   main:  ไม่บวก ใช้เลขของ commit ที่ผ่าน rc มาแล้ว
   preflight:
-    name: Check release version
+    name: Resolve version
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      version: ${{ steps.resolve.outputs.version }}
+      build: ${{ steps.resolve.outputs.build }}
+      is_new: ${{ steps.resolve.outputs.is_new }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # ให้เห็น parent ของ merge commit บน main
 
-      - name: Read version
-        id: version
+      - name: Resolve version
+        id: resolve
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d '+' -f 1)
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Version: ${VERSION}"
-
-      - name: Check release tag is unused
-        if: github.ref_name == 'main'
-        env:
-          TAG: v${{ steps.version.outputs.version }}
-        run: |
-          # annotated tag มีสองบรรทัด บรรทัดท้าย (^{}) คือ commit ที่ tag ชี้
-          EXISTING=$(git ls-remote origin "refs/tags/${TAG}" "refs/tags/${TAG}^{}" | tail -1 | cut -f1)
-          if [ -n "$EXISTING" ] && [ "$EXISTING" != "$GITHUB_SHA" ]; then
-            echo "::error::Tag ${TAG} already exists on another commit. Bump version in pubspec.yaml before releasing."
-            exit 1
-          fi
-          echo "Tag ${TAG} is free or already on this commit"
+          export BASE_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d '+' -f 1)
+          node .github/scripts/resolve-version.mjs
 
   android:
     name: Android (Firebase App Distribution)
@@ -85,19 +81,14 @@ jobs:
           echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > firebase_credentials.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/firebase_credentials.json" >> $GITHUB_ENV
 
-      - name: Extract Version Number
-        run: |
-          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | cut -d '+' -f 1)
-          echo "FLUTTER_VERSION=${VERSION}" >> $GITHUB_ENV
-          echo "Current version: ${VERSION}"
-
       - name: Distribute Android app with Fastlane
         run: |
           cd android
           bundle exec fastlane distribute_firebase
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-          FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
+          FLUTTER_VERSION: ${{ needs.preflight.outputs.version }}
+          BUILD_NUMBER: ${{ needs.preflight.outputs.build }}
 
   web:
     name: Web (Vercel)
@@ -134,7 +125,10 @@ jobs:
         run: flutter pub get
 
       - name: Build web
-        run: flutter build web --release --dart-define-from-file=config/${APP_ENV}.json --build-number=${BUILD_NUMBER}
+        env:
+          VERSION: ${{ needs.preflight.outputs.version }}
+          BUILD_NUMBER: ${{ needs.preflight.outputs.build }}
+        run: flutter build web --release --dart-define-from-file=config/${APP_ENV}.json --build-name=${VERSION} --build-number=${BUILD_NUMBER}
 
       # แต่ละ project ให้บริการจาก production deployment ของตัวเอง
       # จึง deploy ด้วย --prod ทั้งคู่ ตัวเลือก dev/prod อยู่ที่ project id
@@ -143,11 +137,11 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: npx --yes vercel@65.16.0 deploy build/web --prod --yes --token="$VERCEL_TOKEN"
 
-  # บน main: ติด tag v<version> ให้เองเมื่อทั้ง android และ web ผ่าน
+  # rc/**: จดเลขของรอบนี้เป็น tag เมื่อทั้ง android และ web ผ่าน (main ไม่ติด tag ใหม่)
   tag:
-    name: Tag release
+    name: Tag build
     needs: [preflight, android, web]
-    if: github.ref_name == 'main'
+    if: needs.preflight.outputs.is_new == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -157,13 +151,10 @@ jobs:
 
       - name: Create and push tag
         env:
-          TAG: v${{ needs.preflight.outputs.version }}
+          VERSION: ${{ needs.preflight.outputs.version }}
+          BUILD_NUMBER: ${{ needs.preflight.outputs.build }}
         run: |
-          if [ -n "$(git ls-remote origin "refs/tags/${TAG}")" ]; then
-            echo "Tag ${TAG} already exists on this commit, nothing to do"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "${TAG}" -m "Release ${TAG#v}"
-          git push origin "${TAG}"
+          git tag -a "v${VERSION}" -m "v${VERSION} build ${BUILD_NUMBER}"
+          git push origin "v${VERSION}"
