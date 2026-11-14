@@ -33,6 +33,8 @@
   - minor ขยับเมื่อเริ่มรอบ release ใหม่ (แตก `rc/x.y.0`)
   - patch ขยับเฉพาะ hotfix ของเวอร์ชันที่ปล่อย prod ไปแล้ว
   - แก้ bug ระหว่างทดสอบ RC ไม่ต้องขยับเลขเวอร์ชัน
+- ก่อน merge เข้า `main` ทุกครั้ง เลขใน `pubspec.yaml` ต้องยังไม่เคยปล่อย
+  ถ้า tag `v<เลขนั้น>` มีอยู่แล้วที่ commit อื่น CI บน `main` จะ fail ที่ job "Check release version"
 - build number มาจาก CI (`github.run_number`) อย่าใส่เอง
 
 ## ขั้นตอน release
@@ -42,7 +44,7 @@
    ให้กลุ่ม `internal-testers`
 3. แก้ bug บน branch `rc/x.y.0` จนผ่าน
 4. merge เข้า `main` → CI build ด้วย `config/prod.json`
-5. ติด tag `vx.y.z` ที่ `main`
+5. CI ติด tag `vx.y.z` ที่ `main` ให้เองเมื่อ android และ web ผ่าน (ไม่ต้องติดมือ)
 6. hotfix: แตก `hotfix/x.y.z` จาก `main` ขยับ patch แล้ว merge กลับ `main`
 
 ถ้า release รอบนั้นแก้ backend ด้วย ให้ใช้ชื่อ branch `rc/x.y.0` เดียวกันใน

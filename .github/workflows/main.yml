@@ -12,9 +12,43 @@ env:
   APP_ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
   BUILD_NUMBER: ${{ github.run_number }}  # เพิ่มขึ้นทุกครั้งที่ workflow รัน
 
+permissions:
+  contents: read
+
 jobs:
+  # บน main: กันการปล่อย prod ด้วยเลขเวอร์ชันซ้ำกับรอบก่อน (tag v<version> มีอยู่แล้วที่ commit อื่น)
+  preflight:
+    name: Check release version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d '+' -f 1)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Version: ${VERSION}"
+
+      - name: Check release tag is unused
+        if: github.ref_name == 'main'
+        env:
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          # annotated tag มีสองบรรทัด บรรทัดท้าย (^{}) คือ commit ที่ tag ชี้
+          EXISTING=$(git ls-remote origin "refs/tags/${TAG}" "refs/tags/${TAG}^{}" | tail -1 | cut -f1)
+          if [ -n "$EXISTING" ] && [ "$EXISTING" != "$GITHUB_SHA" ]; then
+            echo "::error::Tag ${TAG} already exists on another commit. Bump version in pubspec.yaml before releasing."
+            exit 1
+          fi
+          echo "Tag ${TAG} is free or already on this commit"
+
   android:
     name: Android (Firebase App Distribution)
+    needs: preflight
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -67,6 +101,7 @@ jobs:
 
   web:
     name: Web (Vercel)
+    needs: preflight
     runs-on: ubuntu-latest
     concurrency:
       group: web-${{ github.ref_name == 'main' && 'prod' || 'dev' }}
@@ -107,3 +142,28 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: npx --yes vercel@65.16.0 deploy build/web --prod --yes --token="$VERCEL_TOKEN"
+
+  # บน main: ติด tag v<version> ให้เองเมื่อทั้ง android และ web ผ่าน
+  tag:
+    name: Tag release
+    needs: [preflight, android, web]
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create and push tag
+        env:
+          TAG: v${{ needs.preflight.outputs.version }}
+        run: |
+          if [ -n "$(git ls-remote origin "refs/tags/${TAG}")" ]; then
+            echo "Tag ${TAG} already exists on this commit, nothing to do"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Release ${TAG#v}"
+          git push origin "${TAG}"
