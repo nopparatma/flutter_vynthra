@@ -47,7 +47,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
         'กรุณากรอกสิ่งที่คุณอยากรู้',
         'โปรดพิมพ์สิ่งที่คุณอยากรู้ก่อนสุ่มไพ่',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;
@@ -104,7 +104,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
         'กรุณากรอกสิ่งที่คุณอยากรู้',
         'โปรดพิมพ์สิ่งที่คุณอยากรู้ก่อนทำนาย',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;
@@ -115,7 +115,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
         'กรุณาเลือกไพ่',
         'โปรดสุ่มไพ่ก่อนทำนาย',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.withOpacity(0.8),
+        backgroundColor: Colors.orange.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;
@@ -176,7 +176,7 @@ class _CardFortunePageState extends State<CardFortunePage> with TickerProviderSt
                               width: 150,
                               height: 250,
                               decoration: BoxDecoration(
-                                color: isAnimating || selectedCard != null ? null : Colors.white.withOpacity(0.1),
+                                color: isAnimating || selectedCard != null ? null : Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isAnimating || selectedCard != null ? Colors.transparent : Colors.grey,
@@ -343,7 +343,7 @@ class QuestionInputSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

@@ -143,7 +143,7 @@ class _CommonLayoutState extends State<CommonLayout> with SingleTickerProviderSt
               childrenAnimation: ExpandableFabAnimation.none,
               distance: 70,
               overlayStyle: ExpandableFabOverlayStyle(
-                color: AppTheme.dialogBackgroundColor.withOpacity(0.9),
+                color: AppTheme.dialogBackgroundColor.withValues(alpha: 0.9),
                 blur: 5,
               ),
               openCloseStackAlignment: Alignment.centerLeft,

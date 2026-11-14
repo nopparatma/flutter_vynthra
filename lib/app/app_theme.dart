@@ -72,7 +72,7 @@ class AppTheme {
     scaffoldBackgroundColor: scaffoldBackgroundColor,
     cardColor: cardColor,
     dividerColor: dividerColor,
-    dialogBackgroundColor: dialogBackgroundColor,
+    dialogTheme: DialogThemeData(backgroundColor: dialogBackgroundColor),
     colorScheme: ColorScheme.dark(
       primary: primaryColor,
       secondary: accentColor,

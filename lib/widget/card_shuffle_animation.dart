@@ -178,7 +178,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
         borderRadius: BorderRadius.circular(width * 0.06),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -228,7 +228,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
             children: [
               Icon(
                 Icons.auto_awesome,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 size: width * 0.2,
               ),
               SizedBox(height: height * 0.05),
@@ -236,7 +236,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                 card.name.th.isNotEmpty ? card.name.th : card.name.en,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   fontWeight: FontWeight.bold,
                   fontSize: width * 0.1,
                 ),
@@ -273,7 +273,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -287,15 +287,15 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(width * 0.05),
             border: Border.all(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               width: 2,
             ),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorPair[1].withOpacity(0.8),
-                colorPair[0].withOpacity(0.8),
+                colorPair[1].withValues(alpha: 0.8),
+                colorPair[0].withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -305,14 +305,14 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
               children: [
                 Icon(
                   Icons.auto_awesome,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   size: width * 0.25,
                 ),
                 SizedBox(height: height * 0.05),
                 Text(
                   'ไพ่ ${index + 1}',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontWeight: FontWeight.bold,
                     fontSize: width * 0.12,
                   ),
@@ -372,7 +372,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(width * 0.06),
         border: Border.all(
-          color: Colors.grey.withOpacity(0.3),
+          color: Colors.grey.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -394,11 +394,11 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(constraints.maxWidth * 0.08),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.accentColor.withOpacity(glowAnimation.value * 0.3),
+                    color: AppTheme.accentColor.withValues(alpha: glowAnimation.value * 0.3),
                     spreadRadius: glowAnimation.value * 2,
                     blurRadius: 10,
                   ),
@@ -449,7 +449,7 @@ class _CardShuffleAnimationState extends State<CardShuffleAnimation> with Ticker
                         return Container(
                           padding: EdgeInsets.symmetric(vertical: constraints.maxHeight * 0.025),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(constraints.maxWidth * 0.08),
                               bottomRight: Radius.circular(constraints.maxWidth * 0.08),

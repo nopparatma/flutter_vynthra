@@ -136,7 +136,7 @@ class _ViewAllCardsPageState extends State<ViewAllCardsPage> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
