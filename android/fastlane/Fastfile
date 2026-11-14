@@ -9,16 +9,20 @@ platform :android do
     app_env = options[:env] || ENV["APP_ENV"] || "dev"
     config_file = "config/#{app_env}.json"
     UI.user_error!("Unknown environment: #{app_env}") unless File.exist?(File.expand_path("../../#{config_file}", __dir__))
-    puts "Using version: #{version_number} (#{app_env})"
+    # build number จาก CI (GitHub run number) ถ้าไม่ได้ส่งมาจะใช้ค่าจาก pubspec.yaml
+    build_number = ENV["BUILD_NUMBER"].to_s.strip
+    build_number_flag = build_number.empty? ? "" : " --build-number=#{build_number}"
+    build_label = build_number.empty? ? version_number : "#{version_number}+#{build_number}"
+    puts "Using version: #{build_label} (#{app_env})"
 
     # สร้าง Flutter APK
-    sh("cd .. && cd .. && flutter build apk --release --dart-define-from-file=#{config_file}")
+    sh("cd .. && cd .. && flutter build apk --release --dart-define-from-file=#{config_file}#{build_number_flag}")
 
     # ใช้ Firebase App Distribution
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       groups: "internal-testers", # แก้ไขตามต้องการ
-      release_notes: "Vynthra version #{version_number} (#{app_env})",
+      release_notes: "Vynthra version #{build_label} (#{app_env})",
       service_credentials_file: ENV["GOOGLE_APPLICATION_CREDENTIALS"],
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk"
     )

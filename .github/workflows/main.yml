@@ -64,6 +64,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FLUTTER_VERSION: ${{ env.FLUTTER_VERSION }}
           APP_ENV: ${{ env.APP_ENV }}
+          BUILD_NUMBER: ${{ github.run_number }}  # เพิ่มขึ้นทุกครั้งที่ workflow รัน
 
       # ถ้าต้องการ build สำหรับ iOS เพิ่มขั้นตอนต่อไปนี้
       # - name: Install CocoaPods
