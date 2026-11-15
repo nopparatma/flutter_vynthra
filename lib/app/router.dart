@@ -4,6 +4,10 @@ import 'package:vynthra/modules/card_fortune/card_fortune.dart';
 import 'package:vynthra/modules/card_question/card_question.dart';
 import 'package:vynthra/modules/gemini_prediction/gemini_prediction.dart';
 import 'package:vynthra/modules/card_standard/card_standard.dart';
+import 'package:vynthra/modules/houses/house_reading_page.dart';
+import 'package:vynthra/modules/houses/houses_end_page.dart';
+import 'package:vynthra/modules/houses/houses_spread_page.dart';
+import 'package:vynthra/modules/houses/houses_start_page.dart';
 import 'package:vynthra/modules/landing/home.dart';
 import 'package:vynthra/modules/landing/splash.dart';
 import 'package:get/get.dart';
@@ -18,6 +22,10 @@ class RoutePath {
   static const String viewAllCardsPage = '/view-all-cards';
   static const String cardDetailPage = '/cards-detail';
   static const String geminiPrediction = '/gemini-prediction';
+  static const String housesStartPage = '/houses';
+  static const String housesSpreadPage = '/houses/spread';
+  static const String houseReadingPage = '/houses/reading';
+  static const String housesEndPage = '/houses/end';
 }
 
 class AppRouter {
@@ -30,6 +38,10 @@ class AppRouter {
     CommonGetPage(name: RoutePath.viewAllCardsPage, page: () => ViewAllCardsPage()),
     CommonGetPage(name: RoutePath.cardDetailPage, page: () => CardDetailPage()),
     CommonGetPage(name: RoutePath.geminiPrediction, page: () => GeminiPredictionPage()),
+    CommonGetPage(name: RoutePath.housesStartPage, page: () => HousesStartPage()),
+    CommonGetPage(name: RoutePath.housesSpreadPage, page: () => HousesSpreadPage()),
+    CommonGetPage(name: RoutePath.houseReadingPage, page: () => HouseReadingPage()),
+    CommonGetPage(name: RoutePath.housesEndPage, page: () => HousesEndPage()),
   ];
 }
 

@@ -24,6 +24,7 @@ dependencies:
   package_info_plus: ^10.2.2
   shared_preferences: ^2.5.3
   http: ^1.6.0
+  wakelock_plus: ^1.8.2
 
 dev_dependencies:
   flutter_test:
@@ -42,6 +43,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/cosmos/
 
   fonts:
     - family: Cloud
